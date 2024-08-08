@@ -51,23 +51,39 @@ async function handleLeave(interaction: ButtonInteraction, teamId: string) {
         return;
     }
 
-    if (team.leader === interaction.user.id) {
-        await interaction.reply({ content: 'Як лідер, ви не можете покинути команду. Використайте кнопку "Розпустити", щоб видалити команду.', ephemeral: true });
-        return;
+    const isLeader = team.leader === interaction.user.id;
+    const wasInReserve = team.reserve.includes(interaction.user.id);
+
+    if (isLeader) {
+        if (team.players.length === 1) {
+            delete teams[teamId];
+            await interaction.message.delete();
+            await interaction.reply({ content: 'Ви покинули команду. Оскільки ви були єдиним гравцем, команду розформовано.', ephemeral: true });
+            return;
+        } else {
+            const newLeaderIndex = team.players.findIndex(id => id !== interaction.user.id);
+            if (newLeaderIndex !== -1) {
+                team.leader = team.players[newLeaderIndex];
+                await interaction.client.users.cache.get(team.leader)?.send(`Ви стали новим лідером команди ${teamId}.`);
+            }
+        }
     }
 
-    const wasInReserve = team.reserve.includes(interaction.user.id);
     team.players = team.players.filter(id => id !== interaction.user.id);
     team.reserve = team.reserve.filter(id => id !== interaction.user.id);
 
-    if (!wasInReserve && team.reserve.length > 0 && team.players.length < 5) {
+    if (!wasInReserve && team.reserve.length > 0 && team.players.length < team.slots) {
         const newPlayer = team.reserve.shift()!;
         team.players.push(newPlayer);
         await interaction.client.users.cache.get(newPlayer)?.send(`Вас переміщено з резерву до активного складу команди ${teamId}.`);
     }
 
     await updateTeamMessage(interaction.client, teamId);
-    await interaction.reply({ content: wasInReserve ? 'Ви покинули резерв команди.' : 'Ви покинули команду.', ephemeral: true });
+    
+    const leaveMessage = isLeader 
+        ? 'Ви покинули команду і передали роль лідера іншому гравцю.' 
+        : (wasInReserve ? 'Ви покинули резерв команди.' : 'Ви покинули команду.');
+    await interaction.reply({ content: leaveMessage, ephemeral: true });
 }
 
 async function handleDisband(interaction: ButtonInteraction, teamId: string) {
