@@ -137,3 +137,8 @@ export async function findOrCreateGamesCategory(guild: Guild): Promise<CategoryC
         return null;
     }
 }
+
+export function isPositiveResponse(input: string): boolean {
+    const positiveResponses = ['так', 'yes', 'y', 'да', 'true', '1'];
+    return positiveResponses.includes(input.toLowerCase().trim());
+}

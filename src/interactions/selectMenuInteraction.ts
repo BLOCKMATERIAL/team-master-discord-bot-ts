@@ -47,9 +47,9 @@ export async function showCreateTeamModal(interaction: StringSelectMenuInteracti
 
     const createVoiceChannelInput = new TextInputBuilder()
     .setCustomId('create_voice_channel_input')
-    .setLabel('Створити голосовий канал? (так/ні)')
+    .setLabel('Створити голосовий канал? (Не обов\'язково)')
     .setStyle(TextInputStyle.Short)
-    .setPlaceholder('так')
+    .setPlaceholder('Так/Yes/Y/1/True')
     .setRequired(false)
     .setMaxLength(3);
 

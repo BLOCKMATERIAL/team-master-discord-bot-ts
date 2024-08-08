@@ -1,5 +1,5 @@
 import { ChannelType, ModalSubmitInteraction } from "discord.js";
-import { createTeamButtons, createTeamEmbed, findOrCreateGamesCategory, generateTeamId, getGameNameByValue, teams } from "../utils";
+import { createTeamButtons, createTeamEmbed, findOrCreateGamesCategory, generateTeamId, getGameNameByValue, isPositiveResponse, teams } from "../utils";
 import { logger } from "..";
 
 export async function handleModalSubmit(interaction: ModalSubmitInteraction) {
@@ -25,9 +25,8 @@ export async function handleModalSubmit(interaction: ModalSubmitInteraction) {
             startTime = startTimeInput;
         }
         const teamId = generateTeamId();
-        const createVoiceChannelInput = interaction.fields.getTextInputValue('create_voice_channel_input').toLowerCase();
-        const shouldCreateVoiceChannel = createVoiceChannelInput === 'так' || createVoiceChannelInput === 'yes';
-
+        const createVoiceChannelInput = interaction.fields.getTextInputValue('create_voice_channel_input');
+        const shouldCreateVoiceChannel = isPositiveResponse(createVoiceChannelInput);
         let voiceChannelId: string | undefined;
 
         if (shouldCreateVoiceChannel && interaction.guild) {
