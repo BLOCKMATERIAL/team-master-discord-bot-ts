@@ -29,8 +29,8 @@ export async function showSlotsModal(interaction: MessageComponentInteraction, g
 export async function handleSelectMenuInteraction(interaction: StringSelectMenuInteraction) {
     if (interaction.customId === 'select_game') {
         const selectedGame = interaction.values[0];
-        logger.info(`User ${interaction.user.id} selected game ${selectedGame}`);
         interaction.deleteReply()
+        logger.info(`User ${interaction.user.id} selected game ${selectedGame}`);
         await showSlotsModal(interaction, selectedGame);
     }
 }
