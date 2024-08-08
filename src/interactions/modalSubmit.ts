@@ -33,7 +33,7 @@ export async function handleModalSubmit(interaction: ModalSubmitInteraction) {
             try {
                 const gamesCategory = await findOrCreateGamesCategory(interaction.guild);
                 const voiceChannel = await interaction.guild.channels.create({
-                    name: `Team ${teamId} ${game} - Voice`,
+                    name: `Team ${teamId} ${getGameNameByValue(game)} - Voice`,
                     type: ChannelType.GuildVoice,
                     userLimit: slots,
                     parent: gamesCategory ? gamesCategory.id : undefined
