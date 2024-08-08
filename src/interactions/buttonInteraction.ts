@@ -56,6 +56,9 @@ async function handleLeave(interaction: ButtonInteraction, teamId: string) {
 
     if (isLeader) {
         if (team.players.length === 1) {
+            if (team.voiceChannelId) {
+                await deleteVoiceChannel(interaction, team.voiceChannelId);
+            }
             delete teams[teamId];
             await interaction.message.delete();
             await interaction.reply({ content: 'Ви покинули команду. Оскільки ви були єдиним гравцем, команду розформовано.', ephemeral: true });
@@ -98,23 +101,25 @@ async function handleDisband(interaction: ButtonInteraction, teamId: string) {
         return;
     }
     let voiceChannelDeleted = false;
-    if (team.voiceChannelId && interaction.guild) {
-        try {
-            const voiceChannel = await interaction.guild.channels.fetch(team.voiceChannelId);
-            if (voiceChannel && voiceChannel.type === ChannelType.GuildVoice) {
-                await voiceChannel.delete();
-                voiceChannelDeleted = true;
-                logger.info(`Deleted voice channel ${team.voiceChannelId} for disbanded team ${teamId}`);
-            }
-        } catch (error) {
-            logger.error(`Failed to delete voice channel for team ${teamId}: ${error}`);
-        }
-    }
-
+    team.voiceChannelId  && await deleteVoiceChannel(interaction, team.voiceChannelId);
     delete teams[teamId];
     await interaction.message.delete();
     const replyContent = voiceChannelDeleted
         ? 'Команду розпущено, і голосовий канал видалено.'
         : 'Команду розпущено.';
     await interaction.reply({ content: replyContent, ephemeral: true });
+}
+
+async function deleteVoiceChannel(interaction: ButtonInteraction, channelId: string) {
+    if (interaction.guild) {
+        try {
+            const channel = await interaction.guild.channels.fetch(channelId);
+            if (channel && channel.type === ChannelType.GuildVoice) {
+                await channel.delete();
+                logger.info(`Deleted voice channel ${channelId}`);
+            }
+        } catch (error) {
+            logger.error(`Failed to delete voice channel ${channelId}: ${error}`);
+        }
+    }
 }

@@ -118,7 +118,7 @@ export function getTeamIdByLeader(userId: string): string | null {
 export async function findOrCreateGamesCategory(guild: Guild): Promise<CategoryChannel | null> {
     try {
         const existingCategory = guild.channels.cache.find(
-            channel => channel.type === ChannelType.GuildCategory && channel.name.toUpperCase() === 'GAMES'
+            channel => channel.type === ChannelType.GuildCategory && channel.name.toUpperCase() === `TEMP VOICE CHANNELS (TEAM MASTER BOT)`
         ) as CategoryChannel | undefined;
 
         if (existingCategory) {
@@ -126,8 +126,9 @@ export async function findOrCreateGamesCategory(guild: Guild): Promise<CategoryC
         }
 
         const newCategory = await guild.channels.create({
-            name: 'TEMP VOICE CHANNELS',
+            name: 'TEMP VOICE CHANNELS (TEAM MASTER BOT)',
             type: ChannelType.GuildCategory
+
         });
 
         logger.info(`Created new GAMES category in guild ${guild.id}`);
