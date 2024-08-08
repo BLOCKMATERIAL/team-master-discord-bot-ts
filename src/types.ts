@@ -8,6 +8,7 @@ export interface Team {
     messageId: string;
     slots: number;
     game: string;
+    startTime?: string;
 }
 
 export interface Game {

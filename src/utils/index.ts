@@ -27,8 +27,14 @@ export function createTeamEmbed(teamId: string): EmbedBuilder {
         .setTitle(`🎮 Команда ${teamId}`)
         .setColor('#00ff00');
 
-    embed.addFields({ name: 'Гра', value: getGameNameByValue(team.game), inline: true });
+    embed.addFields(
+        { name: 'Гра', value: getGameNameByValue(team.game), inline: true }
+    );
 
+    if (team.startTime) {
+        embed.addFields({ name: 'Час початку', value: team.startTime, inline: true });
+    }
+    
     const playerList = [];
     for (let i = 0; i < team.slots; i++) {
         if (i < team.players.length) {

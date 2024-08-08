@@ -1,10 +1,19 @@
 import { StringSelectMenuInteraction, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, InteractionResponse, MessageComponentInteraction, MessageInteraction, ButtonBuilder, ButtonStyle } from "discord.js";
-import { getGameNameByValue } from "../utils";
 import { logger } from "..";
-export async function showSlotsModal(interaction: MessageComponentInteraction, game: string) {
+
+export async function handleSelectMenuInteraction(interaction: StringSelectMenuInteraction) {
+    if (interaction.customId === 'select_game') {
+        const selectedGame = interaction.values[0];
+        interaction.deleteReply()
+        logger.info(`User ${interaction.user.id} selected game ${selectedGame}`);
+        await showSlotsModal(interaction, selectedGame);
+    }
+}
+
+export async function showSlotsModal(interaction: StringSelectMenuInteraction, game: string) {
     const modal = new ModalBuilder()
         .setCustomId(`create_team_modal_${game}`)
-        .setTitle('Вкажіть кількість гравців');
+        .setTitle('Створення команди');
 
     const slotsInput = new TextInputBuilder()
         .setCustomId('slots_input')
@@ -15,22 +24,24 @@ export async function showSlotsModal(interaction: MessageComponentInteraction, g
         .setMinLength(1)
         .setMaxLength(2);
 
-    const slotsRow = new ActionRowBuilder<TextInputBuilder>().addComponents(slotsInput);
+    const startTimeInput = new TextInputBuilder()
+        .setCustomId('start_time_input')
+        .setLabel('Час початку гри (HH:MM, необов\'язково)')
+        .setStyle(TextInputStyle.Short)
+        .setPlaceholder('18:00')
+        .setRequired(false)
+        .setMinLength(5)
+        .setMaxLength(5);
 
-    modal.addComponents(slotsRow);
+    const slotsRow = new ActionRowBuilder<TextInputBuilder>().addComponents(slotsInput);
+    const startTimeRow = new ActionRowBuilder<TextInputBuilder>().addComponents(startTimeInput);
+
+    modal.addComponents(slotsRow, startTimeRow);
 
     try {
         await interaction.showModal(modal);
     } catch (error) {
         console.error('Error showing modal:', error);
-    }
-}
-
-export async function handleSelectMenuInteraction(interaction: StringSelectMenuInteraction) {
-    if (interaction.customId === 'select_game') {
-        const selectedGame = interaction.values[0];
-        interaction.deleteReply()
-        logger.info(`User ${interaction.user.id} selected game ${selectedGame}`);
-        await showSlotsModal(interaction, selectedGame);
+        logger.error(`Error showing create team modal: ${error}`);
     }
 }
