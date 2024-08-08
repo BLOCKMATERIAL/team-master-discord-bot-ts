@@ -1,0 +1,44 @@
+{
+    "games": [
+      {
+        "name": "Counter-Strike: Global Offensive",
+        "value": "csgo"
+      },
+      {
+        "name": "Dota 2",
+        "value": "dota2"
+      },
+      {
+        "name": "League of Legends",
+        "value": "lol"
+      },
+      {
+        "name": "Valorant",
+        "value": "valorant"
+      },
+      {
+        "name": "Overwatch",
+        "value": "overwatch"
+      },
+      {
+        "name": "Rainbow Six Siege",
+        "value": "r6siege"
+      },
+      {
+        "name": "Rocket League",
+        "value": "rocketleague"
+      },
+      {
+        "name": "Apex Legends",
+        "value": "apexlegends"
+      },
+      {
+        "name": "Team Fortress 2",
+        "value": "tf2"
+      },
+      {
+        "name": "PUBG: Battlegrounds",
+        "value": "pubg"
+      }
+    ]
+  }

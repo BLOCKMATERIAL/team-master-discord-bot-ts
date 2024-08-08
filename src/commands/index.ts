@@ -1,0 +1,37 @@
+import { REST, Routes, SlashCommandBuilder, Client } from 'discord.js';
+
+const commands = [
+    new SlashCommandBuilder()
+        .setName('create')
+        .setDescription('Створити нову команду')
+        .toJSON(),
+    new SlashCommandBuilder()
+        .setName('kick')
+        .setDescription('Вигнати гравця з команди')
+        .addUserOption(option => 
+            option.setName('player')
+                .setDescription('Гравець, якого потрібно вигнати')
+                .setRequired(true))
+        .toJSON(),
+    new SlashCommandBuilder()
+        .setName('help')
+        .setDescription('Показати довідку по командам бота')
+        .toJSON(),
+];
+
+export async function registerCommands(client: Client) {
+    const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN!);
+
+    try {
+        console.log('Почали оновлення команд додатка (/) .');
+
+        await rest.put(
+            Routes.applicationCommands(client.user!.id),
+            { body: commands },
+        );
+
+        console.log('Успішно оновили команди додатка (/) .');
+    } catch (error) {
+        console.error(error);
+    }
+}

@@ -1,0 +1,24 @@
+{
+  "name": "team-master-discord-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsc-watch --onSuccess \"node dist/index.js\"",
+    "build:start": "yarn build && yarn start"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@discordjs/rest": "^2.3.0",
+    "discord.js": "^14.15.3",
+    "dotenv": "^16.4.5",
+    "winston": "^3.14.0"
+  },
+  "devDependencies": {
+    "tsc-watch": "^6.2.0"
+  }
+}
