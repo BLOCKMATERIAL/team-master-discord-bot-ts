@@ -6,11 +6,11 @@ export async function handleSelectMenuInteraction(interaction: StringSelectMenuI
         const selectedGame = interaction.values[0];
         interaction.deleteReply()
         logger.info(`User ${interaction.user.id} selected game ${selectedGame}`);
-        await showSlotsModal(interaction, selectedGame);
+        await showCreateTeamModal(interaction, selectedGame);
     }
 }
 
-export async function showSlotsModal(interaction: StringSelectMenuInteraction, game: string) {
+export async function showCreateTeamModal(interaction: StringSelectMenuInteraction, game: string) {
     const modal = new ModalBuilder()
         .setCustomId(`create_team_modal_${game}`)
         .setTitle('Створення команди');
@@ -33,10 +33,19 @@ export async function showSlotsModal(interaction: StringSelectMenuInteraction, g
         .setMinLength(5)
         .setMaxLength(5);
 
+    const notesInput = new TextInputBuilder()
+        .setCustomId('notes_input')
+        .setLabel('Нотатки (необов\'язково)')
+        .setStyle(TextInputStyle.Paragraph)
+        .setPlaceholder('Вимоги до команди або код запрошення групи')
+        .setRequired(false)
+        .setMaxLength(1000);
+
     const slotsRow = new ActionRowBuilder<TextInputBuilder>().addComponents(slotsInput);
     const startTimeRow = new ActionRowBuilder<TextInputBuilder>().addComponents(startTimeInput);
+    const notesRow = new ActionRowBuilder<TextInputBuilder>().addComponents(notesInput);
 
-    modal.addComponents(slotsRow, startTimeRow);
+    modal.addComponents(slotsRow, startTimeRow, notesRow);
 
     try {
         await interaction.showModal(modal);

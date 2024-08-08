@@ -9,6 +9,7 @@ export interface Team {
     slots: number;
     game: string;
     startTime?: string;
+    notes?: string;
 }
 
 export interface Game {

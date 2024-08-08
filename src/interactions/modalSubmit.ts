@@ -7,6 +7,7 @@ export async function handleModalSubmit(interaction: ModalSubmitInteraction) {
         const game = interaction.customId.split('_').pop()!;
         const slotsInput = interaction.fields.getTextInputValue('slots_input');
         const startTimeInput = interaction.fields.getTextInputValue('start_time_input');
+        const notesInput = interaction.fields.getTextInputValue('notes_input');
         const slots = parseInt(slotsInput);
 
         if (isNaN(slots) || slots < 2 || slots > 10) {
@@ -16,7 +17,6 @@ export async function handleModalSubmit(interaction: ModalSubmitInteraction) {
 
         let startTime: string | undefined;
         if (startTimeInput) {
-            // Validate start time format (HH:MM) only if provided
             const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
             if (!timeRegex.test(startTimeInput)) {
                 await interaction.reply({ content: 'Невірний формат часу. Використовуйте формат HH:MM.', ephemeral: true });
@@ -25,7 +25,7 @@ export async function handleModalSubmit(interaction: ModalSubmitInteraction) {
             startTime = startTimeInput;
         }
 
-        logger.info(`User ${interaction.user.id} created a team for game ${game} with ${slots} slots${startTime ? `, starting at ${startTime}` : ''}`);
+        logger.info(`User ${interaction.user.id} created a team for game ${game} with ${slots} slots${startTime ? `, starting at ${startTime}` : ''}${notesInput ? ' with notes' : ''}`);
         
         const teamId = generateTeamId();
         teams[teamId] = {
@@ -35,6 +35,7 @@ export async function handleModalSubmit(interaction: ModalSubmitInteraction) {
             reserve: [],
             createdAt: new Date(),
             startTime,
+            notes: notesInput || undefined,
             channelId: interaction.channelId!,
             messageId: '',
             slots: slots,

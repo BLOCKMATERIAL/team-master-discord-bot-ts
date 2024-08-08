@@ -35,6 +35,10 @@ export function createTeamEmbed(teamId: string): EmbedBuilder {
         embed.addFields({ name: 'Час початку', value: team.startTime, inline: true });
     }
     
+    if (team.notes) {
+        embed.addFields({ name: 'Нотатки', value: team.notes, inline: false });
+    }
+    
     const playerList = [];
     for (let i = 0; i < team.slots; i++) {
         if (i < team.players.length) {
