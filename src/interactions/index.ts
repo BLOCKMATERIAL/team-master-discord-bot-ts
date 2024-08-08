@@ -5,18 +5,27 @@ import { handleHelpCommand } from './helpCommand';
 import { handleSelectMenuInteraction } from './selectMenuInteraction';
 import { handleButtonInteraction } from './buttonInteraction';
 import { handleModalSubmit } from './modalSubmit';
+import { logger } from '..';
+import { handleCreateVoiceCommand } from './createVoiceCommand';
 
 export async function handleInteraction(interaction: Interaction) {
     try {
         if (interaction.isChatInputCommand()) {
             const { commandName } = interaction;
 
-            if (commandName === 'create') {
-                await handleCreateCommand(interaction);
-            } else if (commandName === 'kick') {
-                await handleKickCommand(interaction);
-            } else if (commandName === 'help') {
-                await handleHelpCommand(interaction);
+            switch (commandName) {
+                case 'create':
+                    await handleCreateCommand(interaction);
+                    break;
+                case 'kick':
+                    await handleKickCommand(interaction);
+                    break;
+                case 'help':
+                    await handleHelpCommand(interaction);
+                    break;
+                case 'createvoice':
+                    await handleCreateVoiceCommand(interaction);
+                    break;
             }
         } else if (interaction.isButton()) {
             await handleButtonInteraction(interaction);
@@ -27,7 +36,6 @@ export async function handleInteraction(interaction: Interaction) {
         }
     } catch (error) {
         console.error('Error handling interaction:', error);
+        logger.error('Error handling interaction:', error);
     }
 }
-
-

@@ -1,5 +1,5 @@
-import { ModalSubmitInteraction } from "discord.js";
-import { createTeamButtons, createTeamEmbed, generateTeamId, getGameNameByValue, teams } from "../utils";
+import { ChannelType, ModalSubmitInteraction } from "discord.js";
+import { createTeamButtons, createTeamEmbed, findOrCreateGamesCategory, generateTeamId, getGameNameByValue, teams } from "../utils";
 import { logger } from "..";
 
 export async function handleModalSubmit(interaction: ModalSubmitInteraction) {
@@ -24,10 +24,30 @@ export async function handleModalSubmit(interaction: ModalSubmitInteraction) {
             }
             startTime = startTimeInput;
         }
+        const teamId = generateTeamId();
+        const createVoiceChannelInput = interaction.fields.getTextInputValue('create_voice_channel_input').toLowerCase();
+        const shouldCreateVoiceChannel = createVoiceChannelInput === 'так' || createVoiceChannelInput === 'yes';
+
+        let voiceChannelId: string | undefined;
+
+        if (shouldCreateVoiceChannel && interaction.guild) {
+            try {
+                const gamesCategory = await findOrCreateGamesCategory(interaction.guild);
+                const voiceChannel = await interaction.guild.channels.create({
+                    name: `Team ${teamId} - Voice`,
+                    type: ChannelType.GuildVoice,
+                    userLimit: slots,
+                    parent: gamesCategory ? gamesCategory.id : undefined
+                });
+                voiceChannelId = voiceChannel.id;
+                logger.info(`Created voice channel for team ${teamId} in ${gamesCategory ? 'GAMES category' : 'server root'}: ${voiceChannelId}`);
+            } catch (error) {
+                logger.error(`Failed to create voice channel for team ${teamId}: ${error}`);
+            }
+        }
 
         logger.info(`User ${interaction.user.id} created a team for game ${game} with ${slots} slots${startTime ? `, starting at ${startTime}` : ''}${notesInput ? ' with notes' : ''}`);
         
-        const teamId = generateTeamId();
         teams[teamId] = {
             id: teamId,
             leader: interaction.user.id,
@@ -35,6 +55,7 @@ export async function handleModalSubmit(interaction: ModalSubmitInteraction) {
             reserve: [],
             createdAt: new Date(),
             startTime,
+            voiceChannelId,
             notes: notesInput || undefined,
             channelId: interaction.channelId!,
             messageId: '',

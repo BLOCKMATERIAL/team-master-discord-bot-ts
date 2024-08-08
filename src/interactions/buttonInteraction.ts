@@ -1,6 +1,6 @@
-import { ButtonInteraction } from "discord.js";
+import { ButtonInteraction, ChannelType } from "discord.js";
 import { isUserInAnyTeam, teams, updateTeamMessage } from "../utils";
-
+import { logger } from "..";
 export async function handleButtonInteraction(interaction: ButtonInteraction) {
     const [action, teamId] = interaction.customId.split('_');
 
@@ -97,8 +97,24 @@ async function handleDisband(interaction: ButtonInteraction, teamId: string) {
         await interaction.reply({ content: 'Тільки лідер команди може розпустити команду.', ephemeral: true });
         return;
     }
+    let voiceChannelDeleted = false;
+    if (team.voiceChannelId && interaction.guild) {
+        try {
+            const voiceChannel = await interaction.guild.channels.fetch(team.voiceChannelId);
+            if (voiceChannel && voiceChannel.type === ChannelType.GuildVoice) {
+                await voiceChannel.delete();
+                voiceChannelDeleted = true;
+                logger.info(`Deleted voice channel ${team.voiceChannelId} for disbanded team ${teamId}`);
+            }
+        } catch (error) {
+            logger.error(`Failed to delete voice channel for team ${teamId}: ${error}`);
+        }
+    }
 
     delete teams[teamId];
     await interaction.message.delete();
-    await interaction.reply({ content: 'Команду розпущено.', ephemeral: true });
+    const replyContent = voiceChannelDeleted
+        ? 'Команду розпущено, і голосовий канал видалено.'
+        : 'Команду розпущено.';
+    await interaction.reply({ content: replyContent, ephemeral: true });
 }

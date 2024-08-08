@@ -45,7 +45,17 @@ export async function showCreateTeamModal(interaction: StringSelectMenuInteracti
     const startTimeRow = new ActionRowBuilder<TextInputBuilder>().addComponents(startTimeInput);
     const notesRow = new ActionRowBuilder<TextInputBuilder>().addComponents(notesInput);
 
-    modal.addComponents(slotsRow, startTimeRow, notesRow);
+    const createVoiceChannelInput = new TextInputBuilder()
+    .setCustomId('create_voice_channel_input')
+    .setLabel('Створити голосовий канал? (так/ні)')
+    .setStyle(TextInputStyle.Short)
+    .setPlaceholder('так')
+    .setRequired(false)
+    .setMaxLength(3);
+
+    const createVoiceChannelRow = new ActionRowBuilder<TextInputBuilder>().addComponents(createVoiceChannelInput);
+
+    modal.addComponents(slotsRow, startTimeRow, notesRow, createVoiceChannelRow);
 
     try {
         await interaction.showModal(modal);

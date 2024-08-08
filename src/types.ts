@@ -10,6 +10,7 @@ export interface Team {
     game: string;
     startTime?: string;
     notes?: string;
+    voiceChannelId?: string;
 }
 
 export interface Game {

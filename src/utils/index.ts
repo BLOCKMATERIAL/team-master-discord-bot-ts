@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import { Team, Game } from '../types';
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Client, EmbedBuilder } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CategoryChannel, ChannelType, Client, EmbedBuilder, Guild } from 'discord.js';
+import { logger } from '..';
 
 export const teams: { [key: string]: Team } = {};
 
@@ -37,6 +38,10 @@ export function createTeamEmbed(teamId: string): EmbedBuilder {
     
     if (team.notes) {
         embed.addFields({ name: 'Нотатки', value: team.notes, inline: false });
+    }
+
+    if (team.voiceChannelId) {
+        embed.addFields({ name: 'Голосовий канал', value: `<#${team.voiceChannelId}>`, inline: true });
     }
     
     const playerList = [];
@@ -107,4 +112,28 @@ export function getTeamIdByLeader(userId: string): string | null {
         }
     }
     return null;
+}
+
+
+export async function findOrCreateGamesCategory(guild: Guild): Promise<CategoryChannel | null> {
+    try {
+        const existingCategory = guild.channels.cache.find(
+            channel => channel.type === ChannelType.GuildCategory && channel.name.toUpperCase() === 'GAMES'
+        ) as CategoryChannel | undefined;
+
+        if (existingCategory) {
+            return existingCategory;
+        }
+
+        const newCategory = await guild.channels.create({
+            name: 'TEMP VOICE CHANNELS',
+            type: ChannelType.GuildCategory
+        });
+
+        logger.info(`Created new GAMES category in guild ${guild.id}`);
+        return newCategory;
+    } catch (error) {
+        logger.error(`Failed to find or create GAMES category: ${error}`);
+        return null;
+    }
 }
