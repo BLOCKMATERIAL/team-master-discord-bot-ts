@@ -1,6 +1,7 @@
 import { ButtonInteraction, ChannelType } from "discord.js";
 import { isUserInAnyTeam, teams, updateTeamMessage } from "../utils";
-import { logger } from "..";
+import logger from "../logger";
+
 export async function handleButtonInteraction(interaction: ButtonInteraction) {
     const [action, teamId] = interaction.customId.split('_');
 

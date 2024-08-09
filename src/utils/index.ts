@@ -1,8 +1,7 @@
 import * as fs from 'fs';
 import { Team, Game } from '../types';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CategoryChannel, ChannelType, Client, EmbedBuilder, Guild } from 'discord.js';
-import { logger } from '..';
-
+import logger from '../logger';
 export const teams: { [key: string]: Team } = {};
 
 export const games: Game[] = JSON.parse(fs.readFileSync('games.json', 'utf-8')).games;

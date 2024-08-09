@@ -5,7 +5,7 @@ import { handleHelpCommand } from './helpCommand';
 import { handleSelectMenuInteraction } from './selectMenuInteraction';
 import { handleButtonInteraction } from './buttonInteraction';
 import { handleModalSubmit } from './modalSubmit';
-import { logger } from '..';
+import logger from '../logger';
 import { handleCreateVoiceCommand } from './createVoiceCommand';
 import { handleInviteCommand } from './inviteCommand';
 

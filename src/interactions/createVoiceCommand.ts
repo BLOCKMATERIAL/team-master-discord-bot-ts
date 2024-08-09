@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, ChannelType } from "discord.js";
-import { logger } from "..";
+import logger from "../logger";
 
 export async function handleCreateVoiceCommand(interaction: ChatInputCommandInteraction) {
     const channelName = interaction.options.getString('name', true);

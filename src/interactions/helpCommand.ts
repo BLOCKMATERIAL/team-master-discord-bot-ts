@@ -1,8 +1,7 @@
 import { ChatInputCommandInteraction, EmbedBuilder, AttachmentBuilder } from "discord.js";
 import * as path from 'path';
 import * as fs from 'fs';
-import { logger } from "..";
-
+import logger from "../logger";
 
 export async function handleHelpCommand(interaction: ChatInputCommandInteraction) {
     const embed = new EmbedBuilder()

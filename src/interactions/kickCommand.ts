@@ -1,6 +1,6 @@
 import { ChatInputCommandInteraction, Client } from "discord.js";
 import { getTeamIdByLeader, teams, updateTeamMessage } from "../utils";
-import { logger } from "..";
+import logger from "../logger";
 
 export async function handleKickCommand(interaction: ChatInputCommandInteraction) {
     const teamId = getTeamIdByLeader(interaction.user.id);

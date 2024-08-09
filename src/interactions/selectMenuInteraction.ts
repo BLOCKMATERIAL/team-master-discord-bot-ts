@@ -1,5 +1,5 @@
 import { StringSelectMenuInteraction, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, InteractionResponse, MessageComponentInteraction, MessageInteraction, ButtonBuilder, ButtonStyle } from "discord.js";
-import { logger } from "..";
+import logger from "../logger";
 
 export async function handleSelectMenuInteraction(interaction: StringSelectMenuInteraction) {
     if (interaction.customId === 'select_game') {

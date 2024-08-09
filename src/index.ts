@@ -2,9 +2,9 @@ import { Client, GatewayIntentBits, Partials, Events } from 'discord.js';
 import * as dotenv from 'dotenv';
 import { registerCommands } from './commands';
 import { handleInteraction } from './interactions';
+import logger from './logger';
 
 dotenv.config();
-export const logger = require('./logger');
 
 
 const client = new Client({
@@ -18,7 +18,7 @@ const client = new Client({
 });
 
 client.once(Events.ClientReady, async () => {
-    logger.info(`Бот вошел в систему как ${client.user}`);
+    logger.info(`Бот вошел в систему как ${client.user?.displayName}`);
     await registerCommands(client);
 });
 

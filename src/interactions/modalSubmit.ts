@@ -1,6 +1,6 @@
 import { ChannelType, ModalSubmitInteraction } from "discord.js";
 import { createTeamButtons, createTeamEmbed, findOrCreateGamesCategory, generateTeamId, getGameNameByValue, isPositiveResponse, teams } from "../utils";
-import { logger } from "..";
+import logger from "../logger";
 
 export async function handleModalSubmit(interaction: ModalSubmitInteraction) {
     if (interaction.customId.startsWith('create_team_modal_')) {
