@@ -68,7 +68,9 @@ export function createTeamEmbed(teamId: string): EmbedBuilder {
         embed.addFields({ name: '✅ Статус:', value: 'Команда повна! 🎉', inline: false });
     }
 
-    embed.setFooter({ text: `🆓 Вільних місць: ${team.slots - team.players.length}` });
+    embed.setFooter({ text: `🆓 Вільних місць: ${team.slots - team.players.length} | ⏳ Місць у резерві: ${2 - team.reserve.length}` });
+
+
 
     return embed;
 }
@@ -76,13 +78,15 @@ export function createTeamEmbed(teamId: string): EmbedBuilder {
 export function createTeamButtons(teamId: string): ActionRowBuilder<ButtonBuilder> {
     const team = teams[teamId];
     const isTeamFull = team.players.length >= team.slots;
+    const isReserveFull = team.reserve.length >= 2;
 
     return new ActionRowBuilder<ButtonBuilder>()
         .addComponents(
             new ButtonBuilder()
                 .setCustomId(`join_${teamId}`)
-                .setLabel(isTeamFull ? 'Черга' : 'Приєднатися')
-                .setStyle(ButtonStyle.Success),
+                .setLabel(isTeamFull ? (isReserveFull ? 'Повна' : 'Черга') : 'Приєднатися')
+                .setStyle(ButtonStyle.Success)
+                .setDisabled(isTeamFull && isReserveFull),
             new ButtonBuilder()
                 .setCustomId(`leave_${teamId}`)
                 .setLabel('Покинути')
