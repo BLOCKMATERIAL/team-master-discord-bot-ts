@@ -5,7 +5,7 @@ export async function handleSelectMenuInteraction(interaction: StringSelectMenuI
     if (interaction.customId === 'select_game') {
         const selectedGame = interaction.values[0];
         interaction.deleteReply()
-        logger.info(`User ${interaction.user.id} selected game ${selectedGame}`);
+        logger.info(`User ${interaction.user.id} ${interaction.user.username} selected game ${selectedGame}`);
         await showCreateTeamModal(interaction, selectedGame);
     }
 }

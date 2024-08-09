@@ -1,6 +1,7 @@
 import { ButtonInteraction, ChannelType } from "discord.js";
 import { isUserInAnyTeam, teams, updateTeamMessage } from "../utils";
 import logger from "../logger";
+import { log } from "winston";
 
 export async function handleButtonInteraction(interaction: ButtonInteraction) {
     const [action, teamId] = interaction.customId.split('_');
@@ -33,9 +34,11 @@ async function handleJoin(interaction: ButtonInteraction, teamId: string) {
     if (team.players.length < team.slots) {
         team.players.push(interaction.user.id);
         await interaction.reply({ content: 'Ви приєдналися до команди.', ephemeral: true });
+        logger.info(`User ${interaction.user.id} ${interaction.user.username} joined team ${teamId}`);
     } else if (team.reserve.length < 2) {
         team.reserve.push(interaction.user.id);
         await interaction.reply({ content: 'Команда повна. Вас додано до резерву.', ephemeral: true });
+        logger.info(`User ${interaction.user.id} ${interaction.user.username} joined reserve of team ${teamId} reserve list is ${team.reserve}`);
     } else {
         await interaction.reply({ content: 'На жаль, команда та резерв уже повні.', ephemeral: true });
         return;
@@ -47,11 +50,13 @@ async function handleLeave(interaction: ButtonInteraction, teamId: string) {
     const team = teams[teamId];
     if (!team) {
         await interaction.reply({ content: 'Ця команда більше не існує.', ephemeral: true });
+        logger.info(`User ${interaction.user.id} ${interaction.user.username} tried to leave team ${teamId} but team does not exist`);
         return;
     }
 
     if (!team.players.includes(interaction.user.id) && !team.reserve.includes(interaction.user.id)) {
         await interaction.reply({ content: 'Ви не є учасником цієї команди.', ephemeral: true });
+        logger.info(`User ${interaction.user.id} ${interaction.user.username} tried to leave team ${teamId} but is not a member`);
         return;
     }
 
@@ -66,12 +71,14 @@ async function handleLeave(interaction: ButtonInteraction, teamId: string) {
             delete teams[teamId];
             await interaction.message.delete();
             await interaction.reply({ content: 'Ви покинули команду. Оскільки ви були єдиним гравцем, команду розформовано.', ephemeral: true });
+            logger.info(`User ${interaction.user.id} ${interaction.user.username} disbanded team by leave command ${teamId}`);
             return;
         } else {
             const newLeaderIndex = team.players.findIndex(id => id !== interaction.user.id);
             if (newLeaderIndex !== -1) {
                 team.leader = team.players[newLeaderIndex];
                 await interaction.client.users.cache.get(team.leader)?.send(`Ви стали новим лідером команди ${teamId}.`);
+                logger.info(`User ${interaction.user.id} ${interaction.user.username} left team ${teamId} and passed leadership to ${team.leader}`);
             }
         }
     }

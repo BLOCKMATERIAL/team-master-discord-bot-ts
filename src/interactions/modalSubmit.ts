@@ -77,5 +77,6 @@ export async function handleModalSubmit(interaction: ModalSubmitInteraction) {
         if ('id' in reply) {
             teams[teamId].messageId = reply.id;
         }
+        logger.info(`Team ${teamId} created by ${interaction.user.id} in channel ${interaction.channelId}, team: ${JSON.stringify(teams[teamId])}`);
     }
 }

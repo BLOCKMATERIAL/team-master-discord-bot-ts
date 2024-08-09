@@ -17,7 +17,7 @@ export async function handleCreateVoiceCommand(interaction: ChatInputCommandInte
             userLimit: userLimit ? userLimit + 2 : undefined,
         });
 
-        logger.info(`Created voice channel: ${voiceChannel.id}`);
+        logger.info(`Created voice channel: ${voiceChannel.id} by ueer ${interaction.user.id} for team ${channelName}`);
         await interaction.reply({ content: `Голосовий канал "${channelName}" створено успішно!`, ephemeral: true });
     } catch (error) {
         logger.error(`Failed to create voice channel: ${error}`);

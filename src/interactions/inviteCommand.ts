@@ -1,5 +1,6 @@
 import { ChatInputCommandInteraction } from "discord.js";
 import { getTeamIdByLeader, isUserInAnyTeam, teams, updateTeamMessage } from "../utils";
+import logger from "../logger";
 
 export async function handleInviteCommand(interaction: ChatInputCommandInteraction) {
     const teamId = getTeamIdByLeader(interaction.user.id);
@@ -27,6 +28,7 @@ export async function handleInviteCommand(interaction: ChatInputCommandInteracti
 
     if (team.players.length < team.slots) {
         team.players.push(playerToInvite.id);
+        logger.info(`User invited  ${playerToInvite.id} ${playerToInvite.username} was invited to team ${teamId}`);
         await interaction.reply({ content: `Гравця ${playerToInvite} запрошено до команди.`, ephemeral: true });
     } else {
         team.reserve.push(playerToInvite.id);

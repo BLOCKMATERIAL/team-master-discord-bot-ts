@@ -2,10 +2,12 @@ import { ActionRowBuilder, ChatInputCommandInteraction, StringSelectMenuBuilder,
 import { isUserInAnyTeam } from "../utils";
 
 import { games } from "../utils";
+import logger from "../logger";
 
 export async function handleCreateCommand(interaction: ChatInputCommandInteraction) {
     if (isUserInAnyTeam(interaction.user.id)) {
         await interaction.reply({ content: 'Ви вже є учасником, лідером або в резерві команди. Ви не можете створити нову команду.', ephemeral: true });
+        logger.info(`User ${interaction.user.id} ${interaction.user.username} tried to create a team but is already in a team, ${isUserInAnyTeam(interaction.user.id)}`);
         return;
     }
 
