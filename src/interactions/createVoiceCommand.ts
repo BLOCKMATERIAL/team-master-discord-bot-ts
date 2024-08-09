@@ -14,7 +14,7 @@ export async function handleCreateVoiceCommand(interaction: ChatInputCommandInte
         const voiceChannel = await interaction.guild.channels.create({
             name: channelName,
             type: ChannelType.GuildVoice,
-            userLimit: userLimit
+            userLimit: userLimit ? userLimit + 2 : undefined,
         });
 
         logger.info(`Created voice channel: ${voiceChannel.id}`);
