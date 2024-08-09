@@ -24,9 +24,6 @@ export async function handleInteraction(interaction: Interaction) {
                 case 'help':
                     await handleHelpCommand(interaction);
                     break;
-                case 'createvoice':
-                    await handleCreateVoiceCommand(interaction);
-                    break;
                 case 'invite':
                     await handleInviteCommand(interaction);
                     break;
