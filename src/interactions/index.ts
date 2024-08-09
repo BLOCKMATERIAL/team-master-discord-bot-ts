@@ -7,6 +7,7 @@ import { handleButtonInteraction } from './buttonInteraction';
 import { handleModalSubmit } from './modalSubmit';
 import { logger } from '..';
 import { handleCreateVoiceCommand } from './createVoiceCommand';
+import { handleInviteCommand } from './inviteCommand';
 
 export async function handleInteraction(interaction: Interaction) {
     try {
@@ -25,6 +26,9 @@ export async function handleInteraction(interaction: Interaction) {
                     break;
                 case 'createvoice':
                     await handleCreateVoiceCommand(interaction);
+                    break;
+                case 'invite':
+                    await handleInviteCommand(interaction);
                     break;
             }
         } else if (interaction.isButton()) {

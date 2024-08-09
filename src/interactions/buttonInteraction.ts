@@ -32,9 +32,12 @@ async function handleJoin(interaction: ButtonInteraction, teamId: string) {
     if (team.players.length < team.slots) {
         team.players.push(interaction.user.id);
         await interaction.reply({ content: 'Ви приєдналися до команди.', ephemeral: true });
-    } else {
+    } else if (team.reserve.length < 2) {
         team.reserve.push(interaction.user.id);
-        await interaction.reply({ content: 'Команда повна. Вас додано до черги.', ephemeral: true });
+        await interaction.reply({ content: 'Команда повна. Вас додано до резерву.', ephemeral: true });
+    } else {
+        await interaction.reply({ content: 'На жаль, команда та резерв уже повні.', ephemeral: true });
+        return;
     }
 
     await updateTeamMessage(interaction.client, teamId);
