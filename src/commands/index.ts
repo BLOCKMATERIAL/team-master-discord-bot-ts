@@ -30,6 +30,14 @@ const commands = [
     //             .setDescription('Обмеження кількості користувачів (опціонально)')
     //             .setRequired(false))
     //     .toJSON(),
+    new SlashCommandBuilder()
+    .setName('invite')
+    .setDescription('Запросити гравця до команди')
+    .addUserOption(option =>
+        option.setName('player')
+            .setDescription('Гравець, якого потрібно запросити')
+            .setRequired(true))
+    .toJSON(),
 ];
 
 export async function registerCommands(client: Client) {
