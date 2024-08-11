@@ -29,6 +29,7 @@ const connectWithRetry = async (retryCount = 0, maxRetries = 5) => {
 
     } catch (error) {
         if (retryCount < maxRetries) {
+            logger.error(error);
             logger.warn(`Failed to connect to MongoDB. Retrying in 5 seconds... (Attempt ${retryCount + 1}/${maxRetries})`);
             setTimeout(() => connectWithRetry(retryCount + 1), 5000);
         } else {
