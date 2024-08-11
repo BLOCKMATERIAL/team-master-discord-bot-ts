@@ -25,6 +25,18 @@ const commands = [
             .setDescription('Гравець, якого потрібно запросити')
             .setRequired(true))
     .toJSON(),
+    new SlashCommandBuilder()
+    .setName('init')
+    .setDescription('Вибрати ігри, в які ви граєте')
+    .toJSON(),
+    new SlashCommandBuilder()
+    .setName('disband')
+    .setDescription('Розпустити команду (тільки для адміністраторів)')
+    .addStringOption(option => 
+        option.setName('team_id')
+            .setDescription('ID команди для розпуску')
+            .setRequired(true))
+    .toJSON(),
 ];
 
 export async function registerCommands(client: Client) {

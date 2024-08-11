@@ -1,12 +1,23 @@
 import { StringSelectMenuInteraction, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, InteractionResponse, MessageComponentInteraction, MessageInteraction, ButtonBuilder, ButtonStyle } from "discord.js";
 import logger from "../logger";
+import Game from "../api/models/Game";
 
 export async function handleSelectMenuInteraction(interaction: StringSelectMenuInteraction) {
     if (interaction.customId === 'select_game') {
-        const selectedGame = interaction.values[0];
-        interaction.deleteReply()
-        logger.info(`User ${interaction.user.id} ${interaction.user.username} selected game ${selectedGame}`);
-        await showCreateTeamModal(interaction, selectedGame);
+        const selectedGameValue = interaction.values[0];
+        logger.info(`User ${interaction.user.id} ${interaction.user.username} selected game ${selectedGameValue}`);
+        
+        try {
+            const game = await Game.findOne({ value: selectedGameValue });
+            if (!game) {
+                await interaction.update({ content: 'Обрана гра не знайдена. Спробуйте ще раз.', components: [] });
+                return;
+            }
+            await showCreateTeamModal(interaction, game.value);
+        } catch (error) {
+            logger.error('Error fetching game from database:', error);
+            await interaction.update({ content: 'Виникла помилка при виборі гри. Спробуйте ще раз пізніше.', components: [] });
+        }
     }
 }
 
@@ -60,7 +71,8 @@ export async function showCreateTeamModal(interaction: StringSelectMenuInteracti
     try {
         await interaction.showModal(modal);
     } catch (error) {
-        console.error('Error showing modal:', error);
-        logger.error(`Error showing create team modal: ${error}`);
+        logger.error('Error showing modal:', error);
+        await interaction.update({ content: 'Виникла помилка при відкритті форми створення команди. Спробуйте ще раз пізніше.', components: [] });
     }
 }
+

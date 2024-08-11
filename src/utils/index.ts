@@ -1,8 +1,8 @@
 import * as fs from 'fs';
-import { Team, Game } from '../types';
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CategoryChannel, ChannelType, Client, EmbedBuilder, Guild } from 'discord.js';
+import { Game } from '../types';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CategoryChannel, ChannelType, Client, EmbedBuilder, Guild, } from 'discord.js';
 import logger from '../logger';
-export const teams: { [key: string]: Team } = {};
+import Team, { IPlayer, ITeamData } from '../api/models/User';
 
 export const games: Game[] = JSON.parse(fs.readFileSync('games.json', 'utf-8')).games;
 
@@ -10,10 +10,21 @@ export function generateTeamId(): string {
     return Math.random().toString(36).substring(2, 7).toUpperCase();
 }
 
-export function isUserInAnyTeam(userId: string): boolean {
-    return Object.values(teams).some(team => 
-        team.players.includes(userId) || team.reserve.includes(userId) || team.leader === userId
-    );
+export async function isUserInAnyTeam(userId: string): Promise<boolean | void> {
+    try {
+        const team = await Team.findOne({
+            status: 'active',
+            $or: [
+                { leader: userId },
+                { players: userId },
+                { reserve: userId }
+            ]
+        });
+        return !!team;
+    } catch (error) {
+        
+        logger.error('Error checking if user is in any team:', error);
+    }
 }
 
 export function getGameNameByValue(value: string): string {
@@ -21,10 +32,9 @@ export function getGameNameByValue(value: string): string {
     return game ? game.name : value;
 }
 
-export function createTeamEmbed(teamId: string): EmbedBuilder {
-    const team = teams[teamId];
+export function createTeamEmbed(team: ITeamData): EmbedBuilder {
     const embed = new EmbedBuilder()
-        .setTitle(`🎮 Команда ${teamId}`)
+        .setTitle(`🎮 Команда ${team.teamId}`)
         .setColor('#00ff00');
 
     embed.addFields(
@@ -46,9 +56,9 @@ export function createTeamEmbed(teamId: string): EmbedBuilder {
     const playerList = [];
     for (let i = 0; i < team.slots; i++) {
         if (i < team.players.length) {
-            const playerId = team.players[i];
-            const emoji = playerId === team.leader ? '👑' : '👤';
-            playerList.push(`${emoji} <@${playerId}>`);
+            const player = team.players[i];
+            const emoji = player.id === team.leader ? '👑' : (player.isAdmin ? '🛡️' : '👤');
+            playerList.push(`${emoji} <@${player.id}>`);
         } else {
             playerList.push('🔓 Вільне місце');
         }
@@ -57,10 +67,9 @@ export function createTeamEmbed(teamId: string): EmbedBuilder {
     embed.addFields({ name: '👥 Гравці:', value: playerList.join('\n'), inline: false });
 
     if (team.reserve.length > 0) {
-        const reserveList = team.reserve.map(playerId => `🔹 <@${playerId}>`);
+        const reserveList = team.reserve.map((player: IPlayer) => `🔹 <@${player.id}>`);
         embed.addFields({ name: '🔄 Черга:', value: reserveList.join('\n'), inline: false });
     }
-
     embed.addFields({ name: '🕒 Створено:', value: team.createdAt.toLocaleString(), inline: false });
 
     if (team.players.length === team.slots) {
@@ -69,23 +78,16 @@ export function createTeamEmbed(teamId: string): EmbedBuilder {
 
     embed.setFooter({ text: `🆓 Вільних місць: ${team.slots - team.players.length} | ⏳ Місць у резерві: ${2 - team.reserve.length}` });
 
-
-
     return embed;
 }
 
 export function createTeamButtons(teamId: string): ActionRowBuilder<ButtonBuilder> {
-    const team = teams[teamId];
-    const isTeamFull = team.players.length >= team.slots;
-    const isReserveFull = team.reserve.length >= 2;
-
     return new ActionRowBuilder<ButtonBuilder>()
         .addComponents(
             new ButtonBuilder()
                 .setCustomId(`join_${teamId}`)
-                .setLabel(isTeamFull ? (isReserveFull ? 'Повна' : 'Черга') : 'Приєднатися')
-                .setStyle(ButtonStyle.Success)
-                .setDisabled(isTeamFull && isReserveFull),
+                .setLabel('Приєднатися')
+                .setStyle(ButtonStyle.Success),
             new ButtonBuilder()
                 .setCustomId(`leave_${teamId}`)
                 .setLabel('Покинути')
@@ -98,23 +100,28 @@ export function createTeamButtons(teamId: string): ActionRowBuilder<ButtonBuilde
 }
 
 export async function updateTeamMessage(client: Client, teamId: string) {
-    const team = teams[teamId];
+    const team = await Team.findOne({ teamId: teamId });
+    if (!team) {
+        logger.error(`Team ${teamId} not found in database`);
+        return;
+    }
     const channel = await client.channels.fetch(team.channelId);
     if (channel?.isTextBased()) {
-        const message = await channel.messages.fetch(team.messageId);
-        const embed = createTeamEmbed(teamId);
+        const message = await channel.messages.fetch(team.messageId || '');
+        const embed = createTeamEmbed(team);
         const row = createTeamButtons(teamId);
         await message.edit({ embeds: [embed], components: [row] });
     }
 }
 
-export function getTeamIdByLeader(userId: string): string | null {
-    for (const [teamId, team] of Object.entries(teams)) {
-        if (team.leader === userId) {
-            return teamId;
-        }
+export async function getTeamIdByLeader(userId: string): Promise<string | null> {
+    try {
+        const team = await Team.findOne({ leader: userId, status: 'active' });
+        return team ? team.teamId : null;
+    } catch (error) {
+        logger.error(`Error in getTeamIdByLeader: ${error}`);
+        throw error;
     }
-    return null;
 }
 
 
