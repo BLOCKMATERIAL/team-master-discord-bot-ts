@@ -1,44 +1,88 @@
 {
-    "games": [
-      {
-        "name": "Counter-Strike: Global Offensive",
-        "value": "csgo"
-      },
-      {
-        "name": "Dota 2",
-        "value": "dota2"
-      },
-      {
-        "name": "League of Legends",
-        "value": "lol"
-      },
-      {
-        "name": "Valorant",
-        "value": "valorant"
-      },
-      {
-        "name": "Overwatch",
-        "value": "overwatch"
-      },
-      {
-        "name": "Rainbow Six Siege",
-        "value": "r6siege"
-      },
-      {
-        "name": "Rocket League",
-        "value": "rocketleague"
-      },
-      {
-        "name": "Apex Legends",
-        "value": "apexlegends"
-      },
-      {
-        "name": "Team Fortress 2",
-        "value": "tf2"
-      },
-      {
-        "name": "PUBG: Battlegrounds",
-        "value": "pubg"
-      }
-    ]
-  }
+  "games": [
+    {
+      "name": "Valorant",
+      "value": "valorant"
+    },
+    {
+      "name": "Counter-Strike 2",
+      "value": "cs2"
+    },
+    {
+      "name": "Dota 2",
+      "value": "dota2"
+    },
+    {
+      "name": "League of Legends",
+      "value": "lol"
+    },
+    {
+      "name": "PUBG: Battlegrounds",
+      "value": "pubg"
+    },
+    {
+      "name": "Apex Legends",
+      "value": "apexlegends"
+    },
+    {
+      "name": "Fortnite",
+      "value": "fortnite"
+    },
+    {
+      "name": "The Finals",
+      "value": "thefinals"
+    },
+    {
+      "name": "Hearthstone",
+      "value": "hearthstone"
+    },
+    {
+      "name": "Minecraft",
+      "value": "minecraft"
+    },
+    {
+      "name": "Fall Guys",
+      "value": "fallguys"
+    },
+    {
+      "name": "Forza Horizon",
+      "value": "forzahorizon"
+    },
+    {
+      "name": "Sea of Thieves",
+      "value": "seaofthieves"
+    },
+    {
+      "name": "Stardew Valley",
+      "value": "stardewvalley"
+    },
+    {
+      "name": "Talisman",
+      "value": "talisman"
+    },
+    {
+      "name": "Don't Starve Together",
+      "value": "dontstarvetogether"
+    },
+    {
+      "name": "Content Warning",
+      "value": "contentwarning"
+    },
+    {
+      "name": "Lethal Company",
+      "value": "lethalcompany"
+    },
+    {
+      "name": "Phasmophobia",
+      "value": "phasmophobia"
+    },
+    {
+      "name": "Squad",
+      "value": "squad"
+    },
+    {
+      "name": "GTA Online",
+      "value": "gtaonline"
+    }
+  ]
+}
