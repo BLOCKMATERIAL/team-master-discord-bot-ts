@@ -1,6 +1,8 @@
 import { ChannelType, ModalSubmitInteraction } from "discord.js";
-import { createTeamButtons, createTeamEmbed, findOrCreateGamesCategory, generateTeamId, getGameNameByValue, isPositiveResponse, teams } from "../utils";
+import { createTeamButtons, createTeamEmbed, findOrCreateGamesCategory, generateTeamId, getGameNameByValue, isPositiveResponse } from "../utils";
 import logger from "../logger";
+import Team, {IPlayer, ITeamData } from "../api/models/User";
+import Admin from "../api/models/Admin";
 
 export async function handleModalSubmit(interaction: ModalSubmitInteraction) {
     if (interaction.customId.startsWith('create_team_modal_')) {
@@ -9,7 +11,12 @@ export async function handleModalSubmit(interaction: ModalSubmitInteraction) {
         const startTimeInput = interaction.fields.getTextInputValue('start_time_input');
         const notesInput = interaction.fields.getTextInputValue('notes_input');
         const slots = parseInt(slotsInput);
-
+        const isAdmin = await Admin.findOne({ userId: interaction.user.id });
+        const leader: IPlayer = {
+            id: interaction.user.id,
+            name: interaction.user.username,
+            isAdmin: !!isAdmin
+        };
         if (isNaN(slots) || slots < 2 || slots > 10) {
             await interaction.reply({ content: 'Невірна кількість гравців. Будь ласка, введіть число від 2 до 10.', ephemeral: true });
             return;
@@ -47,36 +54,52 @@ export async function handleModalSubmit(interaction: ModalSubmitInteraction) {
 
         logger.info(`User ${interaction.user.id} created a team for game ${game} with ${slots} slots${startTime ? `, starting at ${startTime}` : ''}${notesInput ? ' with notes' : ''}`);
         
-        teams[teamId] = {
-            id: teamId,
-            leader: interaction.user.id,
-            players: [interaction.user.id],
+        const teamData: ITeamData = {
+            teamId: teamId,
+            leader: leader.id,
+            players: [leader],
             reserve: [],
             createdAt: new Date(),
             startTime,
             voiceChannelId,
+            status: 'active',
             notes: notesInput || undefined,
             channelId: interaction.channelId!,
-            messageId: '',
             slots: slots,
-            game: game
+            game: game,
+            serverId: interaction.guildId!,
+            serverName: interaction.guild?.name || 'Unknown Server' ,
         };
 
-        const embed = createTeamEmbed(teamId);
+        const embed = createTeamEmbed(teamData);
         const row = createTeamButtons(teamId);
 
         const replyContent = `🎉 Гравець ${interaction.user} створив команду для гри ${getGameNameByValue(game)} з ${slots} слотами!${startTime ? ` Початок гри о ${startTime}.` : ''} @everyone`;
 
-        const reply = await interaction.reply({
-            content: replyContent,
-            embeds: [embed],
-            components: [row],
-            fetchReply: true,
-        });
+        try {
+            const reply = await interaction.reply({
+                content: replyContent,
+                embeds: [embed],
+                components: [row],
+                fetchReply: true,
+            });
 
-        if ('id' in reply) {
-            teams[teamId].messageId = reply.id;
+            if ('id' in reply) {
+                const newTeam = new Team({
+                    ...teamData,
+                    messageId: reply.id
+                });
+                await newTeam.save();
+                logger.info(`Team ${teamId} saved to database`);
+            } else {
+                throw new Error('Failed to get message ID from reply');
+            }
+        } catch (error) {
+            logger.error(`Failed to save team ${teamId} to database:`, error);
+            await interaction.followUp({ content: 'Виникла помилка при створенні команди. Будь ласка, спробуйте ще раз.', ephemeral: true });
+            return;
         }
-        logger.info(`Team ${teamId} created by ${interaction.user.id} in channel ${interaction.channelId}, team: ${JSON.stringify(teams[teamId])}`);
+
+        logger.info(`Team ${teamId} created by ${interaction.user.id} in channel ${interaction.channelId}, team: ${JSON.stringify(teamData)}`);
     }
 }
