@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
-import Team from "../api/models/User";
+import Team from "../api/models/Team";
 import logger from "../logger";
 import { getGameNameByValue } from "../utils";
 

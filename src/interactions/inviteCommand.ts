@@ -1,7 +1,7 @@
 import { ChatInputCommandInteraction } from "discord.js";
 import { getTeamIdByLeader, isUserInAnyTeam, updateTeamMessage } from "../utils";
 import logger from "../logger";
-import Team, { IPlayer } from "../api/models/User";
+import Team, { IPlayer } from "../api/models/Team";
 import Admin from "../api/models/Admin";
 
 export async function handleInviteCommand(interaction: ChatInputCommandInteraction) {

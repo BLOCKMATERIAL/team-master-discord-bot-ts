@@ -1,53 +1,35 @@
-import mongoose, { Schema, Document } from 'mongoose';
-export interface IPlayer {
-  id: string;
-  name: string;
-  isAdmin: boolean;
-}
+import { Schema, model, Document } from 'mongoose';
 
-export interface ITeamData {
-  teamId: string; 
-  leader: string;
-  players: IPlayer[];
-  reserve: IPlayer[];
-  createdAt: Date;
-  startTime?: string;
-  voiceChannelId?: string;
-  notes?: string;
-  channelId: string;
-  messageId?: string;
-  slots: number;
-  status: 'active' | 'inactive' | 'disbanded';
-  serverId: string; 
-  serverName: string;
+interface ITeamHistoryEntry {
+  teamId: string;
   game: string;
+  joinedAt: Date;
+  leftAt?: Date;
+  isReserve: boolean;
 }
 
-export interface ITeamDocument extends ITeamData, Document {}
+interface IUser extends Document {
+  userId: string;
+  username: string;
+  displayName: string;
+  games: string[];
+  teamHistory: ITeamHistoryEntry[];
+}
 
-const PlayerSchema = new Schema({
-  id: { type: String, required: true },
-  name: { type: String, required: true },
-  isAdmin: { type: Boolean, default: false }
-});
-
-
-const TeamSchema: Schema = new Schema({
-  teamId: { type: String, required: true, unique: true },  
-  leader: { type: String, required: true },
-  players: [PlayerSchema],
-  reserve: [PlayerSchema],
-  createdAt: { type: Date, required: true },
-  startTime: { type: String },
-  voiceChannelId: { type: String },
-  notes: { type: String },
-  channelId: { type: String, required: true },
-  messageId: { type: String, required: true },
-  slots: { type: Number, required: true },
-  status: { type: String, required: true, enum: ['active', 'inactive', 'disbanded'], default: 'active' },
+const TeamHistoryEntrySchema = new Schema<ITeamHistoryEntry>({
+  teamId: { type: String, required: true },
   game: { type: String, required: true },
-  serverId: { type: String, required: true }, 
-  serverName: { type: String, required: true }
+  joinedAt: { type: Date, required: true },
+  leftAt: { type: Date },
+  isReserve: { type: Boolean, default: false }
 });
 
-export default mongoose.model<ITeamDocument>('Team', TeamSchema);
+const UserSchema = new Schema<IUser>({
+  userId: { type: String, required: true, unique: true },
+  username: { type: String, required: true },
+  displayName: { type: String, required: true },
+  games: [{ type: String, ref: 'Game' }],
+  teamHistory: [TeamHistoryEntrySchema]
+});
+
+export const User = model<IUser>('User', UserSchema);

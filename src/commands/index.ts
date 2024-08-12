@@ -26,7 +26,7 @@ const commands = [
             .setRequired(true))
     .toJSON(),
     new SlashCommandBuilder()
-    .setName('init')
+    .setName('games')
     .setDescription('Вибрати ігри, в які ви граєте')
     .toJSON(),
     new SlashCommandBuilder()

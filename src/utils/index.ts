@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import { Game } from '../types';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CategoryChannel, ChannelType, Client, EmbedBuilder, Guild, } from 'discord.js';
 import logger from '../logger';
-import Team, { IPlayer, ITeamData } from '../api/models/User';
+import Team, { IPlayer, ITeamData } from '../api/models/Team';
 
 export const games: Game[] = JSON.parse(fs.readFileSync('games.json', 'utf-8')).games;
 

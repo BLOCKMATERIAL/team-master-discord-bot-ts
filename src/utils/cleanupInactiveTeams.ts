@@ -1,6 +1,6 @@
 import { Client } from 'discord.js';
 import logger from '../logger';
-import Team from '../api/models/User';  
+import Team from '../api/models/Team';  
 
 const INACTIVE_THRESHOLD = 6 * 60 * 60 * 1000; 
 

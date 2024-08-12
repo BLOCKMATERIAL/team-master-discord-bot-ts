@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, StringSelectMenuBuilder, ActionRowBuilder, StringSelectMenuInteraction } from "discord.js";
-import User from "../api/models/Player";
+import {User} from "../api/models/User";
 import Game from "../api/models/Game";
 import logger from "../logger";
 

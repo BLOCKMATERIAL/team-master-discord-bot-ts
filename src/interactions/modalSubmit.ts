@@ -1,7 +1,7 @@
 import { ChannelType, ModalSubmitInteraction } from "discord.js";
 import { createTeamButtons, createTeamEmbed, findOrCreateGamesCategory, generateTeamId, getGameNameByValue, isPositiveResponse } from "../utils";
 import logger from "../logger";
-import Team, {IPlayer, ITeamData } from "../api/models/User";
+import Team, {IPlayer, ITeamData } from "../api/models/Team";
 import Admin from "../api/models/Admin";
 
 export async function handleModalSubmit(interaction: ModalSubmitInteraction) {
