@@ -72,7 +72,7 @@ export async function handleModalSubmit(interaction: ModalSubmitInteraction) {
         };
 
         const embed = createTeamEmbed(teamData);
-        const row = createTeamButtons(teamId);
+        const row = createTeamButtons(teamData);
 
         const replyContent = `🎉 Гравець ${interaction.user} створив команду для гри ${getGameNameByValue(game)} з ${slots} слотами!${startTime ? ` Початок гри о ${startTime}.` : ''} @everyone`;
 

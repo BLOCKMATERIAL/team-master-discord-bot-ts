@@ -81,19 +81,23 @@ export function createTeamEmbed(team: ITeamData): EmbedBuilder {
     return embed;
 }
 
-export function createTeamButtons(teamId: string): ActionRowBuilder<ButtonBuilder> {
+export function createTeamButtons(team: ITeamData): ActionRowBuilder<ButtonBuilder> {
+    const isTeamFull = team.players.length >= team.slots;
+    const isReserveFull = team.reserve.length >= 2;
+
     return new ActionRowBuilder<ButtonBuilder>()
         .addComponents(
             new ButtonBuilder()
-                .setCustomId(`join_${teamId}`)
-                .setLabel('Приєднатися')
-                .setStyle(ButtonStyle.Success),
+                .setCustomId(`join_${team.teamId}`)
+                .setLabel(isTeamFull ? (isReserveFull ? 'Повна' : 'В чергу') : 'Приєднатися')
+                .setStyle(isTeamFull ? (isReserveFull ? ButtonStyle.Secondary : ButtonStyle.Primary) : ButtonStyle.Success)
+                .setDisabled(isTeamFull && isReserveFull),
             new ButtonBuilder()
-                .setCustomId(`leave_${teamId}`)
+                .setCustomId(`leave_${team.teamId}`)
                 .setLabel('Покинути')
                 .setStyle(ButtonStyle.Danger),
             new ButtonBuilder()
-                .setCustomId(`disband_${teamId}`)
+                .setCustomId(`disband_${team.teamId}`)
                 .setLabel('Розпустити')
                 .setStyle(ButtonStyle.Secondary)
         );
@@ -109,7 +113,7 @@ export async function updateTeamMessage(client: Client, teamId: string) {
     if (channel?.isTextBased()) {
         const message = await channel.messages.fetch(team.messageId || '');
         const embed = createTeamEmbed(team);
-        const row = createTeamButtons(teamId);
+        const row = createTeamButtons(team);
         await message.edit({ embeds: [embed], components: [row] });
     }
 }
