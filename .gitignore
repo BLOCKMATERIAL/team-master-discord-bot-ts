@@ -14,3 +14,6 @@ yarn-error.log*
 *.ntvs*
 *.njsproj
 *.slnx
+package-lock.json
+yarn.lock
+node_modules/.package-lock.json
