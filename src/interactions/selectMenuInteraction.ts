@@ -70,6 +70,8 @@ export async function showCreateTeamModal(interaction: StringSelectMenuInteracti
 
     try {
         await interaction.showModal(modal);
+        await interaction.deleteReply();
+
     } catch (error) {
         logger.error('Error showing modal:', error);
         await interaction.update({ content: 'Виникла помилка при відкритті форми створення команди. Спробуйте ще раз пізніше.', components: [] });

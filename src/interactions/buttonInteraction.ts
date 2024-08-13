@@ -113,7 +113,6 @@ async function handleLeave(interaction: ButtonInteraction, teamId: string) {
         return;
     }
 
-    // Проверка, является ли пользователь лидером и единственным игроком
     const isLeader = playerIndex === 0;
     const isLastPlayer = team.players.length === 1 && team.reserve.length === 0;
 
@@ -127,8 +126,15 @@ async function handleLeave(interaction: ButtonInteraction, teamId: string) {
         await interaction.reply({ content: 'Ви покинули команду. Оскільки ви були єдиним гравцем, команду розформовано.', ephemeral: true });
         logger.info(`Team ${teamId} disbanded as leader ${interaction.user.id} left empty team`);
     } else {
-        // Обычный выход из команды или резерва
-        if (playerIndex !== -1) {
+        if (isLeader && team.players.length > 1) {
+            team.players.splice(playerIndex, 1);
+            const newLeaderIndex = Math.floor(Math.random() * team.players.length);
+            const newLeader = team.players[newLeaderIndex];
+            team.leader = newLeader.id;
+            
+            await interaction.client.users.cache.get(newLeader.id)?.send(`Ви стали новим лідером команди ${teamId}.`);
+            logger.info(`User ${interaction.user.id} left team ${teamId} and leadership passed to ${newLeader.id}`);
+        } else if (playerIndex !== -1) {
             team.players.splice(playerIndex, 1);
             if (team.reserve.length > 0) {
                 const newPlayer = team.reserve.shift()!;
@@ -148,7 +154,6 @@ async function handleLeave(interaction: ButtonInteraction, teamId: string) {
         logger.info(`User ${interaction.user.id} left ${wasInReserve ? 'reserve of ' : ''}team ${teamId}`);
     }
 
-    // Обновляем историю команд пользователя
     const teamHistoryEntry = user.teamHistory.find(entry => entry.teamId === teamId && !entry.leftAt);
     if (teamHistoryEntry) {
         teamHistoryEntry.leftAt = new Date();
@@ -201,6 +206,8 @@ async function handleDisband(interaction: ButtonInteraction, teamId: string) {
     await interaction.reply({ content: 'Команду розпущено.', ephemeral: true });
     logger.info(`Team ${teamId} disbanded by ${interaction.user.id}`);
 }
+
+
 export async function handleDisbandAdmin(interaction: ChatInputCommandInteraction) {
     const isAdmin = await Admin.findOne({ userId: interaction.user.id });
     if (!isAdmin) {
@@ -220,9 +227,47 @@ export async function handleDisbandAdmin(interaction: ChatInputCommandInteractio
         return;
     }
 
-    await Team.deleteOne({ teamId });
+    // Изменяем статус команды вместо удаления
+    team.status = 'disbanded';
+    await team.save();
+
+    try {
+        const channel = await interaction.client.channels.fetch(team.channelId);
+        if (channel?.isTextBased()) {
+            const message = await channel.messages.fetch(team.messageId as string);
+            if (message) {
+                await message.delete();
+                logger.info(`Deleted message for disbanded team ${teamId}`);
+            }
+        }
+    } catch (error) {
+        logger.error(`Failed to delete message for team ${teamId}: ${error}`);
+    }
+
+    if (team.voiceChannelId) {
+        try {
+            const voiceChannel = await interaction.client.channels.fetch(team.voiceChannelId);
+            if (voiceChannel) {
+                await voiceChannel.delete();
+                logger.info(`Deleted voice channel for disbanded team ${teamId}`);
+            }
+        } catch (error) {
+            logger.error(`Failed to delete voice channel for team ${teamId}: ${error}`);
+        }
+    }
+
     await interaction.reply({ content: `Команду ${teamId} розпущено.`, ephemeral: true });
     logger.info(`Admin ${interaction.user.id} disbanded team ${teamId}`);
+
+    // Отправляем сообщения всем участникам команды
+    for (const player of [...team.players, ...team.reserve]) {
+        try {
+            const user = await interaction.client.users.fetch(player.id);
+            await user.send(`Команду ${teamId} було розпущено адміністратором.`);
+        } catch (error) {
+            logger.error(`Failed to send disband notification to user ${player.id}: ${error}`);
+        }
+    }
 }
 
 async function deleteVoiceChannel(interaction: ButtonInteraction, channelId: string): Promise<boolean> {
