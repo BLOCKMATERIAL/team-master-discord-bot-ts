@@ -8,6 +8,7 @@ import { handleModalSubmit } from './modalSubmit';
 import logger from '../logger';
 import { handleInviteCommand } from './inviteCommand';
 import { handleInitCommand, handleInitGameSelection } from './handleInit';
+import { handleMessageCommand } from './handleMessageCommand';
 
 export async function handleInteraction(interaction: Interaction) {
     try {
@@ -32,6 +33,9 @@ export async function handleInteraction(interaction: Interaction) {
                     break;
                 case 'disband':
                     await handleDisbandAdmin(interaction);
+                    break;
+                case 'message':
+                    await handleMessageCommand(interaction);
                     break;
             }
         } else if (interaction.isButton()) {
