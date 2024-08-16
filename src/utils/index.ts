@@ -3,6 +3,7 @@ import { Game } from '../types';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CategoryChannel, ChannelType, Client, EmbedBuilder, Guild, } from 'discord.js';
 import logger from '../logger';
 import Team, { IPlayer, ITeamData } from '../api/models/Team';
+import { getRankEmoji, getValorantRank } from './valorantRankUtil';
 
 export const games: Game[] = JSON.parse(fs.readFileSync('games.json', 'utf-8')).games;
 
@@ -32,10 +33,11 @@ export function getGameNameByValue(value: string): string {
     return game ? game.name : value;
 }
 
-export function createTeamEmbed(team: ITeamData): EmbedBuilder {
+export async function createTeamEmbed(team: ITeamData, guild: Guild, client: Client): Promise<EmbedBuilder> {
     const embed = new EmbedBuilder()
         .setTitle(`🎮 Команда ${team.teamId}`)
-        .setColor('#00ff00');
+        .setColor('#00ff00')
+        .setDescription(`Команда для гри ${getGameNameByValue(team.game)}`);
 
     embed.addFields(
         { name: 'Гра', value: getGameNameByValue(team.game), inline: true }
@@ -58,7 +60,20 @@ export function createTeamEmbed(team: ITeamData): EmbedBuilder {
         if (i < team.players.length) {
             const player = team.players[i];
             const emoji = player.id === team.leader ? '👑' : (player.isAdmin ? '🛡️' : '👤');
-            playerList.push(`${emoji} <@${player.id}>`);
+            let playerDisplay = `${emoji} <@${player.id}>`;
+            
+            if (team.game.toLowerCase() === 'valorant') {
+                const member = await guild.members.fetch(player.id).catch(() => null);
+                if (member) {
+                    const rank = getValorantRank(member);
+                    if (rank) {
+                        const rankEmoji = getRankEmoji(rank);
+                        playerDisplay += ` ${rankEmoji} ${rank}`;
+                    }
+                }
+            }
+            
+            playerList.push(playerDisplay);
         } else {
             playerList.push('🔓 Вільне місце');
         }
@@ -67,9 +82,25 @@ export function createTeamEmbed(team: ITeamData): EmbedBuilder {
     embed.addFields({ name: '👥 Гравці:', value: playerList.join('\n'), inline: false });
 
     if (team.reserve.length > 0) {
-        const reserveList = team.reserve.map((player: IPlayer) => `🔹 <@${player.id}>`);
+        const reserveList = await Promise.all(team.reserve.map(async (player: IPlayer) => {
+            let reserveDisplay = `🔹 <@${player.id}>`;
+            
+            if (team.game.toLowerCase() === 'valorant') {
+                const member = await guild.members.fetch(player.id).catch(() => null);
+                if (member) {
+                    const rank = getValorantRank(member);
+                    if (rank) {
+                        const rankEmoji = getRankEmoji(rank);
+                        reserveDisplay += ` ${rankEmoji} ${rank}`;
+                    }
+                }
+            }
+            
+            return reserveDisplay;
+        }));
         embed.addFields({ name: '🔄 Черга:', value: reserveList.join('\n'), inline: false });
     }
+    
     embed.addFields({ name: '🕒 Створено:', value: team.createdAt.toLocaleString(), inline: false });
 
     if (team.players.length === team.slots) {
@@ -103,7 +134,8 @@ export function createTeamButtons(team: ITeamData): ActionRowBuilder<ButtonBuild
         );
 }
 
-export async function updateTeamMessage(client: Client, teamId: string) {
+export async function updateTeamMessage(interaction: any, teamId: string) {
+    const client = interaction.client
     const team = await Team.findOne({ teamId: teamId });
     if (!team) {
         logger.error(`Team ${teamId} not found in database`);
@@ -112,7 +144,8 @@ export async function updateTeamMessage(client: Client, teamId: string) {
     const channel = await client.channels.fetch(team.channelId);
     if (channel?.isTextBased()) {
         const message = await channel.messages.fetch(team.messageId || '');
-        const embed = createTeamEmbed(team);
+        const embed = await createTeamEmbed(team, interaction.guild!, interaction.client);
+
         const row = createTeamButtons(team);
         await message.edit({ embeds: [embed], components: [row] });
     }

@@ -45,7 +45,7 @@ export async function handleKickCommand(interaction: ChatInputCommandInteraction
         }
 
         await team.save();
-        await updateTeamMessage(interaction.client, teamId);
+        await updateTeamMessage(interaction, teamId);
 
         try {
             await playerToKick.send(`Вас було виключено з команди ${teamId}.`);

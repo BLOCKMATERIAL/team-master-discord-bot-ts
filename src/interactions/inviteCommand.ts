@@ -53,7 +53,7 @@ export async function handleInviteCommand(interaction: ChatInputCommandInteracti
         }
 
         await team.save();
-        await updateTeamMessage(interaction.client, teamId);
+        await updateTeamMessage(interaction, teamId);
 
         try {
             await playerToInvite.send(`Вас було запрошено до команди ${teamId}. Використайте команду /join ${teamId}, щоб приєднатися.`);

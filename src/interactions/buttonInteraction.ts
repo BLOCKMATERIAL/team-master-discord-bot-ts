@@ -88,7 +88,7 @@ export async function handleJoin(interaction: ButtonInteraction, teamId: string)
 
     await user.save();
     await team.save();
-    await updateTeamMessage(interaction.client, teamId);
+    await updateTeamMessage(interaction, teamId);
 }
 
 async function handleLeave(interaction: ButtonInteraction, teamId: string) {
@@ -147,7 +147,7 @@ async function handleLeave(interaction: ButtonInteraction, teamId: string) {
         }
 
         await team.save();
-        await updateTeamMessage(interaction.client, teamId);
+        await updateTeamMessage(interaction, teamId);
 
         const leaveMessage = wasInReserve ? 'Ви покинули резерв команди.' : 'Ви покинули команду.';
         await interaction.reply({ content: leaveMessage, ephemeral: true });

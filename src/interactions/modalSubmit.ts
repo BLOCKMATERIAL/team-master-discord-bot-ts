@@ -71,7 +71,7 @@ export async function handleModalSubmit(interaction: ModalSubmitInteraction) {
             serverName: interaction.guild?.name || 'Unknown Server' ,
         };
 
-        const embed = createTeamEmbed(teamData);
+        const embed = await createTeamEmbed(teamData, interaction.guild!, interaction.client);
         const row = createTeamButtons(teamData);
 
         const replyContent = `🎉 Гравець ${interaction.user} створив команду для гри ${getGameNameByValue(game)} з ${slots} слотами!${startTime ? ` Початок гри о ${startTime}.` : ''} @everyone`;
