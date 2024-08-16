@@ -1,4 +1,4 @@
-import { Schema, model, Document } from 'mongoose';
+import { Document, Schema, model } from 'mongoose';
 
 interface ITeamHistoryEntry {
   teamId: string;
@@ -21,7 +21,7 @@ const TeamHistoryEntrySchema = new Schema<ITeamHistoryEntry>({
   game: { type: String, required: true },
   joinedAt: { type: Date, required: true },
   leftAt: { type: Date },
-  isReserve: { type: Boolean, default: false }
+  isReserve: { type: Boolean, default: false },
 });
 
 const UserSchema = new Schema<IUser>({
@@ -29,7 +29,7 @@ const UserSchema = new Schema<IUser>({
   username: { type: String, required: true },
   displayName: { type: String, required: true },
   games: [{ type: String, ref: 'Game' }],
-  teamHistory: [TeamHistoryEntrySchema]
+  teamHistory: [TeamHistoryEntrySchema],
 });
 
 export const User = model<IUser>('User', UserSchema);

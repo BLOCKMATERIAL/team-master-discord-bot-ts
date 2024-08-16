@@ -1,69 +1,77 @@
-import { REST, Routes, SlashCommandBuilder, Client } from 'discord.js';
+import { Client, REST, Routes, SlashCommandBuilder } from 'discord.js';
 
 const commands = [
-    new SlashCommandBuilder()
-        .setName('create')
-        .setDescription('Створити нову команду')
-        .toJSON(),
-    new SlashCommandBuilder()
-        .setName('kick')
-        .setDescription('Вигнати гравця з команди')
-        .addUserOption(option => 
-            option.setName('player')
-                .setDescription('Гравець, якого потрібно вигнати')
-                .setRequired(true))
-        .toJSON(),
-    new SlashCommandBuilder()
-        .setName('help')
-        .setDescription('Показати довідку по командам бота')
-        .toJSON(),
-    new SlashCommandBuilder()
+  new SlashCommandBuilder()
+    .setName('create')
+    .setDescription('Створити нову команду')
+    .toJSON(),
+  new SlashCommandBuilder()
+    .setName('kick')
+    .setDescription('Вигнати гравця з команди')
+    .addUserOption((option) =>
+      option
+        .setName('player')
+        .setDescription('Гравець, якого потрібно вигнати')
+        .setRequired(true),
+    )
+    .toJSON(),
+  new SlashCommandBuilder()
+    .setName('help')
+    .setDescription('Показати довідку по командам бота')
+    .toJSON(),
+  new SlashCommandBuilder()
     .setName('invite')
     .setDescription('Запросити гравця до команди')
-    .addUserOption(option =>
-        option.setName('player')
-            .setDescription('Гравець, якого потрібно запросити')
-            .setRequired(true))
+    .addUserOption((option) =>
+      option
+        .setName('player')
+        .setDescription('Гравець, якого потрібно запросити')
+        .setRequired(true),
+    )
     .toJSON(),
-    new SlashCommandBuilder()
+  new SlashCommandBuilder()
     .setName('games')
     .setDescription('Вибрати ігри, в які ви граєте')
     .toJSON(),
-    new SlashCommandBuilder()
+  new SlashCommandBuilder()
     .setName('disband')
     .setDescription('Розпустити команду (тільки для адміністраторів)')
-    .addStringOption(option => 
-        option.setName('team_id')
-            .setDescription('ID команди для розпуску')
-            .setRequired(true))
+    .addStringOption((option) =>
+      option
+        .setName('team_id')
+        .setDescription('ID команди для розпуску')
+        .setRequired(true),
+    )
     .toJSON(),
-    new SlashCommandBuilder()
+  new SlashCommandBuilder()
     .setName('message')
-    .setDescription('Надіслати повідомлення команді (тільки для адміністраторів)')
-    .addStringOption(option => 
-        option.setName('team_id')
-            .setDescription('ID команди')
-            .setRequired(true))
-    .addStringOption(option => 
-        option.setName('message')
-            .setDescription('Повідомлення для команди')
-            .setRequired(true))
+    .setDescription(
+      'Надіслати повідомлення команді (тільки для адміністраторів)',
+    )
+    .addStringOption((option) =>
+      option.setName('team_id').setDescription('ID команди').setRequired(true),
+    )
+    .addStringOption((option) =>
+      option
+        .setName('message')
+        .setDescription('Повідомлення для команди')
+        .setRequired(true),
+    )
     .toJSON(),
 ];
 
 export async function registerCommands(client: Client) {
-    const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN!);
+  const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN!);
 
-    try {
-        console.log('Почали оновлення команд додатка (/) .');
+  try {
+    console.log('Почали оновлення команд додатка (/) .');
 
-        await rest.put(
-            Routes.applicationCommands(client.user!.id),
-            { body: commands },
-        );
+    await rest.put(Routes.applicationCommands(client.user!.id), {
+      body: commands,
+    });
 
-        console.log('Успішно оновили команди додатка (/) .');
-    } catch (error) {
-        console.error(error);
-    }
+    console.log('Успішно оновили команди додатка (/) .');
+  } catch (error) {
+    console.error(error);
+  }
 }

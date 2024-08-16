@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IAdmin extends Document {
   userId: string;
@@ -11,7 +11,7 @@ const AdminSchema: Schema = new Schema({
   userId: { type: String, required: true, unique: true },
   username: { type: String, required: true },
   displayName: { type: String, required: true },
-  addedAt: { type: Date, default: Date.now }
+  addedAt: { type: Date, default: Date.now },
 });
 
 export default mongoose.model<IAdmin>('Admin', AdminSchema);

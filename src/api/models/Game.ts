@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IGame extends Document {
   name: string;
@@ -7,7 +7,7 @@ export interface IGame extends Document {
 
 const GameSchema: Schema = new Schema({
   name: { type: String, required: true },
-  value: { type: String, required: true, unique: true }
+  value: { type: String, required: true, unique: true },
 });
 
 export default mongoose.model<IGame>('Game', GameSchema);

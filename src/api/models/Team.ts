@@ -1,4 +1,5 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Document, Schema } from 'mongoose';
+
 export interface IPlayer {
   id: string;
   name: string;
@@ -6,7 +7,7 @@ export interface IPlayer {
 }
 
 export interface ITeamData {
-  teamId: string; 
+  teamId: string;
   leader: string;
   players: IPlayer[];
   reserve: IPlayer[];
@@ -18,7 +19,7 @@ export interface ITeamData {
   messageId?: string;
   slots: number;
   status: 'active' | 'inactive' | 'disbanded';
-  serverId: string; 
+  serverId: string;
   serverName: string;
   game: string;
 }
@@ -28,12 +29,11 @@ export interface ITeamDocument extends ITeamData, Document {}
 const PlayerSchema = new Schema({
   id: { type: String, required: true },
   name: { type: String, required: true },
-  isAdmin: { type: Boolean, default: false }
+  isAdmin: { type: Boolean, default: false },
 });
 
-
 const TeamSchema: Schema = new Schema({
-  teamId: { type: String, required: true, unique: true },  
+  teamId: { type: String, required: true, unique: true },
   leader: { type: String, required: true },
   players: [PlayerSchema],
   reserve: [PlayerSchema],
@@ -44,10 +44,15 @@ const TeamSchema: Schema = new Schema({
   channelId: { type: String, required: true },
   messageId: { type: String, required: true },
   slots: { type: Number, required: true },
-  status: { type: String, required: true, enum: ['active', 'inactive', 'disbanded'], default: 'active' },
+  status: {
+    type: String,
+    required: true,
+    enum: ['active', 'inactive', 'disbanded'],
+    default: 'active',
+  },
   game: { type: String, required: true },
-  serverId: { type: String, required: true }, 
-  serverName: { type: String, required: true }
+  serverId: { type: String, required: true },
+  serverName: { type: String, required: true },
 });
 
 export default mongoose.model<ITeamDocument>('Team', TeamSchema);
