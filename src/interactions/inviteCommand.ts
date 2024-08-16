@@ -66,7 +66,7 @@ export async function handleInviteCommand(
     if (team.players.length < team.slots) {
       team.players.push(newPlayer);
       logger.info(
-        `User ${interaction.user.id} invited ${playerToInvite.id} ${playerToInvite.username} to team ${teamId}`,
+        `User ${interaction.user.id} invited ${playerToInvite.id} ${playerToInvite.displayName} to team ${teamId}`,
       );
       await interaction.reply({
         content: `Гравця ${playerToInvite} запрошено до команди.`,
@@ -75,7 +75,7 @@ export async function handleInviteCommand(
     } else {
       team.reserve.push(newPlayer);
       logger.info(
-        `User ${interaction.user.id} invited ${playerToInvite.id} ${playerToInvite.username} to reserve of team ${teamId}`,
+        `User ${interaction.user.id} invited ${playerToInvite.id} ${playerToInvite.displayName} to reserve of team ${teamId}`,
       );
       await interaction.reply({
         content: `Гравця ${playerToInvite} запрошено до резерву команди.`,

@@ -20,7 +20,7 @@ export async function handleCreateCommand(
         ephemeral: true,
       });
       logger.info(
-        `User ${interaction.user.id} ${interaction.user.username} tried to create a team but is already in a team`,
+        `User ${interaction.user.id} ${interaction.user.displayName} tried to create a team but is already in a team`,
       );
       return;
     }

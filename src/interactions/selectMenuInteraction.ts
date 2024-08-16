@@ -20,7 +20,7 @@ export async function handleSelectMenuInteraction(
   if (interaction.customId === 'select_game') {
     const selectedGameValue = interaction.values[0];
     logger.info(
-      `User ${interaction.user.id} ${interaction.user.username} selected game ${selectedGameValue}`,
+      `User ${interaction.user.id} ${interaction.user.displayName} selected game ${selectedGameValue}`,
     );
 
     try {

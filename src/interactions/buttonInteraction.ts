@@ -83,7 +83,7 @@ export async function handleJoin(
       ephemeral: true,
     });
     logger.info(
-      `User ${userId} ${interaction.user.username} joined team ${teamId}`,
+      `User ${userId} ${interaction.user.displayName} joined team ${teamId}`,
     );
   } else if (!isReserveFull) {
     if (isAdmin) {
@@ -96,7 +96,7 @@ export async function handleJoin(
       ephemeral: true,
     });
     logger.info(
-      `User ${userId} ${interaction.user.username} joined queue of team ${teamId}`,
+      `User ${userId} ${interaction.user.displayName} joined queue of team ${teamId}`,
     );
   } else {
     await interaction.reply({
