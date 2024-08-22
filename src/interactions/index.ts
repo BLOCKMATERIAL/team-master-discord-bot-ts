@@ -6,6 +6,7 @@ import {
   handleDisbandAdmin,
 } from './buttonInteraction';
 import { handleCreateCommand } from './createCommand';
+import { handleEditNotesCommand } from './editNotesCommand';
 import { handleInitCommand, handleInitGameSelection } from './handleInit';
 import { handleMessageCommand } from './handleMessageCommand';
 import { handleHelpCommand } from './helpCommand';
@@ -40,6 +41,9 @@ export async function handleInteraction(interaction: Interaction) {
           break;
         case 'message':
           await handleMessageCommand(interaction);
+          break;
+        case 'edit-notes':
+          await handleEditNotesCommand(interaction);
           break;
       }
     } else if (interaction.isButton()) {

@@ -58,6 +58,15 @@ const commands = [
         .setRequired(true),
     )
     .toJSON(),
+    new SlashCommandBuilder()
+    .setName('edit-notes')
+    .setDescription('Змінити нотатки команди (тільки для лідера)')
+    .addStringOption(option =>
+      option.setName('notes')
+        .setDescription('Нові нотатки для команди')
+        .setRequired(true)
+    )
+    .toJSON(),
 ];
 
 export async function registerCommands(client: Client) {
