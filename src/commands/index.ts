@@ -73,6 +73,15 @@ const commands = [
         .setRequired(true)
     )
     .toJSON(),
+    new SlashCommandBuilder()
+    .setName('notifications')
+    .setDescription('Керування налаштуваннями сповіщень')
+    .addBooleanOption(option =>
+      option.setName('enable')
+        .setDescription('Увімкнути або вимкнути сповіщення')
+        .setRequired(false)
+    )
+    .toJSON(),
 ];
 
 export async function registerCommands(client: Client) {

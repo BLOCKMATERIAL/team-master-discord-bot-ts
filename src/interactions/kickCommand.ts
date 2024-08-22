@@ -3,6 +3,7 @@ import { ChatInputCommandInteraction, Client } from 'discord.js';
 import Team from '../api/models/Team';
 import logger from '../logger';
 import { getTeamIdByLeader, updateTeamMessage } from '../utils';
+import { User } from '../api/models/User';
 
 export async function handleKickCommand(
   interaction: ChatInputCommandInteraction
@@ -78,19 +79,26 @@ export async function handleKickCommand(
     await team.save();
     await updateTeamMessage(interaction, teamId);
 
-    try {
-      await playerToKick.send(`Вас було виключено з команди ${teamId}. Причина: ${reason}`);
+    const kickedUser = await User.findOne({ userId: playerToKick.id });
+    if (kickedUser && kickedUser.notificationsEnabled) {
+      try {
+        await playerToKick.send(`Вас було виключено з команди ${teamId}. Причина: ${reason}`);
+        logger.info(
+          `User ${playerToKick.id} was kicked from team ${teamId} and notified. Reason: ${reason}`,
+        );
+      } catch (error) {
+        logger.warn(
+          `Failed to send kick notification to user ${playerToKick.id}: ${error}`,
+        );
+        await interaction.followUp({
+          content: `Не вдалося надіслати повідомлення гравцю ${playerToKick}. Можливо, у них вимкнені особисті повідомлення.`,
+          ephemeral: true,
+        });
+      }
+    } else {
       logger.info(
-        `User ${playerToKick.id} was kicked from team ${teamId} and notified. Reason: ${reason}`,
+        `User ${playerToKick.id} was kicked from team ${teamId} but not notified due to disabled notifications. Reason: ${reason}`,
       );
-    } catch (error) {
-      logger.warn(
-        `Failed to send kick notification to user ${playerToKick.id}: ${error}`,
-      );
-      await interaction.followUp({
-        content: `Не вдалося надіслати повідомлення гравцю ${playerToKick}. Можливо, у них вимкнені особисті повідомлення.`,
-        ephemeral: true,
-      });
     }
 
     await interaction.reply({

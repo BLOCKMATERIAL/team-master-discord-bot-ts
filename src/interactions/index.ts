@@ -9,6 +9,7 @@ import { handleCreateCommand } from './createCommand';
 import { handleEditNotesCommand } from './editNotesCommand';
 import { handleInitCommand, handleInitGameSelection } from './handleInit';
 import { handleMessageCommand } from './handleMessageCommand';
+import { handleNotificationsCommand } from './handleNotificationsCommand';
 import { handleHelpCommand } from './helpCommand';
 import { handleInviteCommand } from './inviteCommand';
 import { handleKickCommand } from './kickCommand';
@@ -44,6 +45,9 @@ export async function handleInteraction(interaction: Interaction) {
           break;
         case 'edit-notes':
           await handleEditNotesCommand(interaction);
+          break;
+        case 'notifications':
+          await handleNotificationsCommand(interaction);
           break;
       }
     } else if (interaction.isButton()) {

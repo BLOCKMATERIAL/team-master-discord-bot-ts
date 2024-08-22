@@ -14,6 +14,8 @@ interface IUser extends Document {
   displayName: string;
   games: string[];
   teamHistory: ITeamHistoryEntry[];
+  notificationsEnabled: boolean;
+
 }
 
 const TeamHistoryEntrySchema = new Schema<ITeamHistoryEntry>({
@@ -30,6 +32,8 @@ const UserSchema = new Schema<IUser>({
   displayName: { type: String, required: true },
   games: [{ type: String, ref: 'Game' }],
   teamHistory: [TeamHistoryEntrySchema],
+  notificationsEnabled: { type: Boolean, default: true },
+
 });
 
 export const User = model<IUser>('User', UserSchema);

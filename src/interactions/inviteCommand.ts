@@ -8,6 +8,7 @@ import {
   isUserInAnyTeam,
   updateTeamMessage,
 } from '../utils';
+import { User } from '../api/models/User';
 
 
 export async function handleInviteCommand(
@@ -101,16 +102,24 @@ export async function handleInviteCommand(
       logger.error(`Failed to get team message link: ${error}`);
     }
 
-    try {
-      await playerToInvite.send(
-        `Вас було запрошено до команди ${teamId}. Натисніть на посилання нижче, щоб приєднатися до команди:\n${messageLink}`
-      );
-    } catch (error) {
-      logger.warn(
-        `Failed to send invitation message to user ${playerToInvite.id}: ${error}`,
-      );
+    const invitedUser = await User.findOne({ userId: playerToInvite.id });
+    if (invitedUser && invitedUser.notificationsEnabled) {
+      try {
+        await playerToInvite.send(
+          `Вас було запрошено до команди ${teamId}. Натисніть на посилання нижче, щоб приєднатися до команди:\n${messageLink}`
+        );
+      } catch (error) {
+        logger.warn(
+          `Failed to send invitation message to user ${playerToInvite.id}: ${error}`,
+        );
+        await interaction.followUp({
+          content: `Не вдалося надіслати повідомлення гравцю ${playerToInvite}. Можливо, у них вимкнені особисті повідомлення.`,
+          ephemeral: true,
+        });
+      }
+    } else {
       await interaction.followUp({
-        content: `Не вдалося надіслати повідомлення гравцю ${playerToInvite}. Можливо, у них вимкнені особисті повідомлення.`,
+        content: `Гравець ${playerToInvite} має вимкнені сповіщення. Повідомлення про запрошення не було надіслано.`,
         ephemeral: true,
       });
     }

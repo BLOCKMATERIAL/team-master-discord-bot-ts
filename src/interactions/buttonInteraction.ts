@@ -337,6 +337,7 @@ async function handleDisband(interaction: ButtonInteraction, teamId: string) {
   await interaction.message.delete();
   await interaction.reply({ content: 'Команду розпущено.', ephemeral: true });
   logger.info(`Team ${teamId} disbanded by ${interaction.user.id} ${interaction.user.displayName}`);
+
 }
 
 export async function handleDisbandAdmin(
