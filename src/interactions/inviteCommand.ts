@@ -102,7 +102,7 @@ export async function handleInviteCommand(
       });
     }
   } catch (error) {
-    console.error(error);
+    logger.error(`Error in handleInviteCommand: ${error}`);
     await interaction.reply({
       content: 'Виникла помилка при обробці команди. Спробуйте ще раз пізніше.',
       ephemeral: true,
