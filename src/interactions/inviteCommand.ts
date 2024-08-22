@@ -9,6 +9,7 @@ import {
   updateTeamMessage,
 } from '../utils';
 import { User } from '../api/models/User';
+import { getUserRole } from '../utils/userRole';
 
 
 export async function handleInviteCommand(
@@ -34,12 +35,13 @@ export async function handleInviteCommand(
       return;
     }
 
-    const isAdmin = await Admin.findOne({ userId: playerToInvite.id });
+    const userRole = await getUserRole(playerToInvite.id);
+
     const newPlayer: IPlayer = {
       id: playerToInvite.id,
       username: playerToInvite.username,
       displayName: playerToInvite.displayName,
-      isAdmin: !!isAdmin,
+      role: userRole,
     };
 
     if (await isUserInAnyTeam(playerToInvite.id)) {

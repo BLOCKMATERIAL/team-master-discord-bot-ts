@@ -15,6 +15,7 @@ import { handleInviteCommand } from './inviteCommand';
 import { handleKickCommand } from './kickCommand';
 import { handleModalSubmit } from './modalSubmit';
 import { handleSelectMenuInteraction } from './selectMenuInteraction';
+import { handleSetRoleCommand } from './handleSetRole';
 
 export async function handleInteraction(interaction: Interaction) {
   try {
@@ -48,6 +49,9 @@ export async function handleInteraction(interaction: Interaction) {
           break;
         case 'notifications':
           await handleNotificationsCommand(interaction);
+          break;
+        case 'set-role':
+          await handleSetRoleCommand(interaction);
           break;
       }
     } else if (interaction.isButton()) {

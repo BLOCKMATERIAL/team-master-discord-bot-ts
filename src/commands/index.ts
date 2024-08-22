@@ -5,7 +5,7 @@ const commands = [
     .setName('create')
     .setDescription('Створити нову команду')
     .toJSON(),
-    new SlashCommandBuilder()
+  new SlashCommandBuilder()
     .setName('kick')
     .setDescription('Вигнати гравця з команди')
     .addUserOption((option) =>
@@ -64,22 +64,45 @@ const commands = [
         .setRequired(true),
     )
     .toJSON(),
-    new SlashCommandBuilder()
+  new SlashCommandBuilder()
     .setName('edit-notes')
     .setDescription('Змінити нотатки команди (тільки для лідера)')
-    .addStringOption(option =>
-      option.setName('notes')
+    .addStringOption((option) =>
+      option
+        .setName('notes')
         .setDescription('Нові нотатки для команди')
-        .setRequired(true)
+        .setRequired(true),
     )
     .toJSON(),
-    new SlashCommandBuilder()
+  new SlashCommandBuilder()
     .setName('notifications')
     .setDescription('Керування налаштуваннями сповіщень')
-    .addBooleanOption(option =>
-      option.setName('enable')
+    .addBooleanOption((option) =>
+      option
+        .setName('enable')
         .setDescription('Увімкнути або вимкнути сповіщення')
-        .setRequired(false)
+        .setRequired(false),
+    )
+    .toJSON(),
+  new SlashCommandBuilder()
+    .setName('set-role')
+    .setDescription('Встановити роль для користувача')
+    .addUserOption((option) =>
+      option
+        .setName('user')
+        .setDescription('Користувач, якому потрібно встановити роль')
+        .setRequired(true),
+    )
+    .addStringOption((option) =>
+      option
+        .setName('role')
+        .setDescription('Нова роль для користувача')
+        .setRequired(true)
+        .addChoices(
+          { name: 'Адміністратор', value: 'admin' },
+          { name: 'Модератор', value: 'moderator' },
+          { name: 'Користувач', value: 'user' },
+        ),
     )
     .toJSON(),
 ];

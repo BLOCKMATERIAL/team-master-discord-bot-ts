@@ -10,7 +10,9 @@
     "build:start": "yarn build && yarn start",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "format": "prettier \"src/**/*.{js,jsx,ts,tsx,css,scss}\" --write",
-    "seed": "ts-node seeds/seedGames.ts"
+    "seed": "ts-node src/seeds/seedGames.ts",
+    "clear-db": "ts-node src/seeds/clearDatabase.ts"
+
   },
   "keywords": [],
   "author": "",

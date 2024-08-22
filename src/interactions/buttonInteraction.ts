@@ -9,6 +9,7 @@ import Team, { IPlayer } from '../api/models/Team';
 import { User } from '../api/models/User';
 import logger from '../logger';
 import { isUserInAnyTeam, updateTeamMessage } from '../utils';
+import { getUserRole } from '../utils/userRole';
 
 export async function handleButtonInteraction(interaction: ButtonInteraction) {
   const [action, teamId] = interaction.customId.split('_');
@@ -31,18 +32,6 @@ export async function handleJoin(
   teamId: string,
 ) {
   try {
-    const isInTeam = await isUserInAnyTeam(interaction.user.id);
-    if (isInTeam) {
-      await interaction.reply({
-        content: 'Ви вже є учасником іншої команди. Ви не можете приєднатися до нової команди.',
-        ephemeral: true,
-      });
-      logger.info(
-        `User ${interaction.user.id} ${interaction.user.displayName} tried to join team ${teamId} but is already in another team`,
-      );
-      return;
-    }
-
     const team = await Team.findOne({ teamId });
     if (!team) {
       await interaction.reply({
@@ -75,12 +64,12 @@ export async function handleJoin(
       });
     }
 
-    const isAdmin = await Admin.findOne({ userId });
+    const userRole = await getUserRole(userId);
     const newPlayer: IPlayer = {
       id: userId,
       username: interaction.user.username,
       displayName: interaction.user.displayName,
-      isAdmin: !!isAdmin,
+      role: userRole,
     };
 
     const isTeamFull = team.players.length >= team.slots;
@@ -96,7 +85,7 @@ export async function handleJoin(
         `User ${userId} ${interaction.user.displayName} joined team ${teamId}`,
       );
     } else if (!isReserveFull) {
-      if (isAdmin) {
+      if (userRole === 'admin' || userRole === 'moderator') {
         team.reserve.unshift(newPlayer);
       } else {
         team.reserve.push(newPlayer);
@@ -106,7 +95,7 @@ export async function handleJoin(
         ephemeral: true,
       });
       logger.info(
-        `User ${userId} ${interaction.user.displayName} joined queue of team ${teamId}${isAdmin ? ' as admin' : ''}`,
+        `User ${userId} ${interaction.user.displayName} joined queue of team ${teamId}`,
       );
     } else {
       await interaction.reply({
@@ -343,10 +332,11 @@ async function handleDisband(interaction: ButtonInteraction, teamId: string) {
 export async function handleDisbandAdmin(
   interaction: ChatInputCommandInteraction,
 ) {
-  const isAdmin = await Admin.findOne({ userId: interaction.user.id });
-  if (!isAdmin) {
+  const userRole = await getUserRole(interaction.user.id);
+
+  if (userRole !== 'admin' && userRole !== 'moderator') {
     await interaction.reply({
-      content: 'Ця команда доступна тільки для адміністраторів.',
+      content: 'Ця команда доступна тільки для адміністраторів та модераторів.',
       ephemeral: true,
     });
     return;

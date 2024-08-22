@@ -31,8 +31,8 @@ export async function isUserInAnyTeam(userId: string): Promise<boolean> {
       $or: [
         { 'leader.id': userId },
         { 'players.id': userId },
-        { 'reserve.id': userId }
-      ]
+        { 'reserve.id': userId },
+      ],
     });
     return !!team;
   } catch (error) {
@@ -94,7 +94,13 @@ export async function createTeamEmbed(
         user = { id: player.id } as User;
       }
       const emoji =
-        player.id === team.leader.id ? '👑' : player.isAdmin ? '🛡️' : '👤';
+        player.id === team.leader.id
+          ? '👑'
+          : player.role === 'admin'
+            ? '🛡️'
+            : player.role === 'moderator'
+              ? '🔧'
+              : '👤';
       let playerDisplay = `${emoji} <@${user.id}>`;
 
       if (team.game.toLowerCase() === 'valorant') {
@@ -230,7 +236,9 @@ export async function updateTeamMessage(interaction: any, teamId: string) {
   }
 }
 
-export async function getTeamIdByLeader(userId: string): Promise<string | null> {
+export async function getTeamIdByLeader(
+  userId: string,
+): Promise<string | null> {
   try {
     const team = await Team.findOne({ 'leader.id': userId, status: 'active' });
     return team ? team.teamId : null;

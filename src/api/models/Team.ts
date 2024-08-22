@@ -4,7 +4,7 @@ export interface IPlayer {
   id: string;
   username: string;
   displayName: string;
-  isAdmin: boolean;
+  role: 'admin' | 'moderator' | 'user';
 }
 
 export interface ITeamData {
@@ -31,7 +31,8 @@ const PlayerSchema = new Schema({
   id: { type: String, required: true },
   username: { type: String, required: true },
   displayName: { type: String, required: true },
-  isAdmin: { type: Boolean, default: false },
+  role: { type: String, enum: ['admin', 'moderator', 'user'], default: 'user' },
+
 });
 
 const TeamSchema: Schema = new Schema({

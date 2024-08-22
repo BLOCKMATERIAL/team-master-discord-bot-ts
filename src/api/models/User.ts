@@ -15,6 +15,8 @@ interface IUser extends Document {
   games: string[];
   teamHistory: ITeamHistoryEntry[];
   notificationsEnabled: boolean;
+  role: 'admin' | 'moderator' | 'user';
+
 
 }
 
@@ -33,6 +35,7 @@ const UserSchema = new Schema<IUser>({
   games: [{ type: String, ref: 'Game' }],
   teamHistory: [TeamHistoryEntrySchema],
   notificationsEnabled: { type: Boolean, default: true },
+  role: { type: String, enum: ['admin', 'moderator', 'user'], default: 'user' },
 
 });
 

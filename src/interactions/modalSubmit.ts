@@ -1,7 +1,8 @@
-import { ChannelType, ModalSubmitInteraction } from 'discord.js';
+import { ChannelType, ModalSubmitInteraction, User } from 'discord.js';
 
 import Admin from '../api/models/Admin';
 import Team, { IPlayer, ITeamData } from '../api/models/Team';
+import { User as UserModel } from '../api/models/User';
 import logger from '../logger';
 import {
   createTeamButtons,
@@ -11,6 +12,7 @@ import {
   getGameNameByValue,
   isPositiveResponse,
 } from '../utils';
+import { getUserRole } from '../utils/userRole';
 
 export async function handleModalSubmit(interaction: ModalSubmitInteraction) {
   if (interaction.customId.startsWith('create_team_modal_')) {
@@ -20,12 +22,28 @@ export async function handleModalSubmit(interaction: ModalSubmitInteraction) {
       interaction.fields.getTextInputValue('start_time_input');
     const notesInput = interaction.fields.getTextInputValue('notes_input');
     const slots = parseInt(slotsInput);
-    const isAdmin = await Admin.findOne({ userId: interaction.user.id });
+    let user = await UserModel.findOne({ userId: interaction.user.id });
+    const userRole = await getUserRole(interaction.user.id);
+
+    if (!user) {
+      user = new UserModel({
+        userId: interaction.user.id,
+        username: interaction.user.username,
+        displayName: interaction.user.displayName,
+        role: 'user',
+        games: [],
+        teamHistory: [],
+        notificationsEnabled: true,
+      });
+      await user.save();
+      logger.info(`Created new user record for ${interaction.user.id}`);
+    }
+
     const leader: IPlayer = {
       id: interaction.user.id,
       username: interaction.user.username,
       displayName: interaction.user.displayName,
-      isAdmin: !!isAdmin,
+      role: userRole,
     };
     if (isNaN(slots) || slots < 2 || slots > 10) {
       await interaction.reply({
@@ -99,6 +117,15 @@ export async function handleModalSubmit(interaction: ModalSubmitInteraction) {
       serverId: interaction.guildId!,
       serverName: interaction.guild?.name || 'Unknown Server',
     };
+
+    user.teamHistory.push({
+      teamId: teamData.teamId,
+      game: teamData.game,
+      joinedAt: new Date(),
+      isReserve: false
+    });
+    await user.save();
+
 
     const embed = await createTeamEmbed(
       teamData,
