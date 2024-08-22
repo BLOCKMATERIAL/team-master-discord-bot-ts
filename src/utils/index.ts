@@ -7,6 +7,7 @@ import {
   Client,
   EmbedBuilder,
   Guild,
+  User,
 } from 'discord.js';
 import * as fs from 'fs';
 
@@ -85,18 +86,27 @@ export async function createTeamEmbed(
   for (let i = 0; i < team.slots; i++) {
     if (i < team.players.length) {
       const player = team.players[i];
+      let user: User;
+      try {
+        user = await client.users.fetch(player.id);
+      } catch (error) {
+        logger.error(`Failed to fetch user ${player.id}: ${error}`);
+        user = { id: player.id } as User;
+      }
       const emoji =
-        player.id === team.leader.id ? '👑' : player.isAdmin ? '🛡️' : '👤'; 
-      let playerDisplay = `${emoji} <@${player.id}>`;
+        player.id === team.leader.id ? '👑' : player.isAdmin ? '🛡️' : '👤';
+      let playerDisplay = `${emoji} <@${user.id}>`;
 
       if (team.game.toLowerCase() === 'valorant') {
-        const member = await guild.members.fetch(player.id).catch(() => null);
-        if (member) {
+        try {
+          const member = await guild.members.fetch(user.id);
           const rank = getValorantRank(member);
           if (rank) {
             const rankEmoji = getRankEmoji(rank);
             playerDisplay += ` ${rankEmoji} ${rank}`;
           }
+        } catch (error) {
+          logger.error(`Failed to fetch member ${user.id}: ${error}`);
         }
       }
 
@@ -115,16 +125,25 @@ export async function createTeamEmbed(
   if (team.reserve.length > 0) {
     const reserveList = await Promise.all(
       team.reserve.map(async (player: IPlayer) => {
-        let reserveDisplay = `🔹 <@${player.id}>`;
+        let user: User;
+        try {
+          user = await client.users.fetch(player.id);
+        } catch (error) {
+          logger.error(`Failed to fetch user ${player.id}: ${error}`);
+          user = { id: player.id } as User;
+        }
+        let reserveDisplay = `🔹 <@${user.id}>`;
 
         if (team.game.toLowerCase() === 'valorant') {
-          const member = await guild.members.fetch(player.id).catch(() => null);
-          if (member) {
+          try {
+            const member = await guild.members.fetch(user.id);
             const rank = getValorantRank(member);
             if (rank) {
               const rankEmoji = getRankEmoji(rank);
               reserveDisplay += ` ${rankEmoji} ${rank}`;
             }
+          } catch (error) {
+            logger.error(`Failed to fetch member ${user.id}: ${error}`);
           }
         }
 

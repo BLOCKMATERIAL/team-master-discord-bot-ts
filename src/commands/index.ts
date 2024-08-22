@@ -5,7 +5,7 @@ const commands = [
     .setName('create')
     .setDescription('Створити нову команду')
     .toJSON(),
-  new SlashCommandBuilder()
+    new SlashCommandBuilder()
     .setName('kick')
     .setDescription('Вигнати гравця з команди')
     .addUserOption((option) =>
@@ -13,6 +13,12 @@ const commands = [
         .setName('player')
         .setDescription('Гравець, якого потрібно вигнати')
         .setRequired(true),
+    )
+    .addStringOption((option) =>
+      option
+        .setName('reason')
+        .setDescription('Причина виключення з команди')
+        .setRequired(false),
     )
     .toJSON(),
   new SlashCommandBuilder()

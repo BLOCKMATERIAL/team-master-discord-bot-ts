@@ -5,7 +5,7 @@ import logger from '../logger';
 import { getTeamIdByLeader, updateTeamMessage } from '../utils';
 
 export async function handleKickCommand(
-  interaction: ChatInputCommandInteraction,
+  interaction: ChatInputCommandInteraction
 ) {
   try {
     const teamId = await getTeamIdByLeader(interaction.user.id);
@@ -18,6 +18,8 @@ export async function handleKickCommand(
     }
 
     const playerToKick = interaction.options.getUser('player');
+    const reason = interaction.options.getString('reason') || 'Причина не вказана';
+
     if (!playerToKick) {
       await interaction.reply({
         content: 'Вказаного користувача не знайдено.',
@@ -64,11 +66,11 @@ export async function handleKickCommand(
             `Вас переміщено з резерву до активного складу команди ${teamId}.`,
           );
         logger.info(
-          `User ${newPlayer} moved from reserve to active roster in team ${teamId}`,
+          `User ${newPlayer.id} moved from reserve to active roster in team ${teamId}`,
         );
       } catch (error) {
         logger.warn(
-          `Failed to send notification to user ${newPlayer} about moving from reserve: ${error}`,
+          `Failed to send notification to user ${newPlayer.id} about moving from reserve: ${error}`,
         );
       }
     }
@@ -77,9 +79,9 @@ export async function handleKickCommand(
     await updateTeamMessage(interaction, teamId);
 
     try {
-      await playerToKick.send(`Вас було виключено з команди ${teamId}.`);
+      await playerToKick.send(`Вас було виключено з команди ${teamId}. Причина: ${reason}`);
       logger.info(
-        `User ${playerToKick.id} was kicked from team ${teamId} and notified.`,
+        `User ${playerToKick.id} was kicked from team ${teamId} and notified. Reason: ${reason}`,
       );
     } catch (error) {
       logger.warn(
@@ -92,11 +94,11 @@ export async function handleKickCommand(
     }
 
     await interaction.reply({
-      content: `Гравця ${playerToKick} вигнано з команди.`,
+      content: `Гравця ${playerToKick} вигнано з команди. Причина: ${reason}`,
       ephemeral: true,
     });
     logger.info(
-      `User ${interaction.user.id} kicked ${playerToKick.id} from team ${teamId}`,
+      `User ${interaction.user.id} kicked ${playerToKick.id} from team ${teamId}. Reason: ${reason}`,
     );
   } catch (error) {
     console.error(error, 'handleKickCommand');
