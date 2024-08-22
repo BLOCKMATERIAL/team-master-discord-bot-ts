@@ -9,6 +9,7 @@ import {
   updateTeamMessage,
 } from '../utils';
 
+
 export async function handleInviteCommand(
   interaction: ChatInputCommandInteraction,
 ) {
@@ -88,9 +89,21 @@ export async function handleInviteCommand(
     await team.save();
     await updateTeamMessage(interaction, teamId);
 
+    // Получаем ссылку на сообщение команды
+    let messageLink = '';
+    try {
+      const channel = await interaction.client.channels.fetch(team.channelId);
+      if (channel?.isTextBased() && team.messageId) {
+        const message = await channel.messages.fetch(team.messageId);
+        messageLink = message.url;
+      }
+    } catch (error) {
+      logger.error(`Failed to get team message link: ${error}`);
+    }
+
     try {
       await playerToInvite.send(
-        `Вас було запрошено до команди ${teamId}. Використайте команду /join ${teamId}, щоб приєднатися.`,
+        `Вас було запрошено до команди ${teamId}. Натисніть на посилання нижче, щоб приєднатися до команди:\n${messageLink}`
       );
     } catch (error) {
       logger.warn(
