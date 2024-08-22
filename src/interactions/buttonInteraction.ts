@@ -5,7 +5,7 @@ import {
 } from 'discord.js';
 
 import Admin from '../api/models/Admin';
-import Team from '../api/models/Team';
+import Team, { IPlayer } from '../api/models/Team';
 import { User } from '../api/models/User';
 import logger from '../logger';
 import { updateTeamMessage } from '../utils';
@@ -63,9 +63,10 @@ export async function handleJoin(
   }
 
   const isAdmin = await Admin.findOne({ userId });
-  const newPlayer = {
+  const newPlayer: IPlayer = {
     id: userId,
-    name: interaction.user.username,
+    username: interaction.user.username,
+    displayName: interaction.user.displayName,
     isAdmin: !!isAdmin,
   };
 
@@ -73,11 +74,7 @@ export async function handleJoin(
   const isReserveFull = team.reserve.length >= 2;
 
   if (!isTeamFull) {
-    if (isAdmin) {
-      team.players.unshift(newPlayer);
-    } else {
-      team.players.push(newPlayer);
-    }
+    team.players.push(newPlayer);
     await interaction.reply({
       content: 'Ви приєдналися до команди.',
       ephemeral: true,
@@ -118,7 +115,7 @@ export async function handleJoin(
   await updateTeamMessage(interaction, teamId);
 }
 
-async function handleLeave(interaction: ButtonInteraction, teamId: string) {
+export async function handleLeave(interaction: ButtonInteraction, teamId: string) {
   const team = await Team.findOne({ teamId });
   if (!team) {
     await interaction.reply({
@@ -176,7 +173,7 @@ async function handleLeave(interaction: ButtonInteraction, teamId: string) {
       team.players.splice(playerIndex, 1);
       const newLeaderIndex = Math.floor(Math.random() * team.players.length);
       const newLeader = team.players[newLeaderIndex];
-      team.leader = newLeader.id;
+      team.leader = newLeader;
 
       await interaction.client.users.cache
         .get(newLeader.id)

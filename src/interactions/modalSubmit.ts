@@ -23,7 +23,8 @@ export async function handleModalSubmit(interaction: ModalSubmitInteraction) {
     const isAdmin = await Admin.findOne({ userId: interaction.user.id });
     const leader: IPlayer = {
       id: interaction.user.id,
-      name: interaction.user.username,
+      username: interaction.user.username,
+      displayName: interaction.user.displayName,
       isAdmin: !!isAdmin,
     };
     if (isNaN(slots) || slots < 2 || slots > 10) {
@@ -84,7 +85,7 @@ export async function handleModalSubmit(interaction: ModalSubmitInteraction) {
 
     const teamData: ITeamData = {
       teamId: teamId,
-      leader: leader.id,
+      leader: leader,
       players: [leader],
       reserve: [],
       createdAt: new Date(),

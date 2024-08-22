@@ -35,9 +35,11 @@ export async function handleInviteCommand(
     const isAdmin = await Admin.findOne({ userId: playerToInvite.id });
     const newPlayer: IPlayer = {
       id: playerToInvite.id,
-      name: playerToInvite.username,
+      username: playerToInvite.username,
+      displayName: playerToInvite.displayName,
       isAdmin: !!isAdmin,
     };
+
     if (await isUserInAnyTeam(playerToInvite.id)) {
       await interaction.reply({
         content: 'Цей гравець вже є учасником іншої команди або в резерві.',

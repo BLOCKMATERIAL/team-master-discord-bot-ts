@@ -81,7 +81,7 @@ export async function createTeamEmbed(
     if (i < team.players.length) {
       const player = team.players[i];
       const emoji =
-        player.id === team.leader ? '👑' : player.isAdmin ? '🛡️' : '👤';
+        player.id === team.leader.id ? '👑' : player.isAdmin ? '🛡️' : '👤'; 
       let playerDisplay = `${emoji} <@${player.id}>`;
 
       if (team.game.toLowerCase() === 'valorant') {
