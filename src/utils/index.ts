@@ -23,15 +23,20 @@ export function generateTeamId(): string {
   return Math.random().toString(36).substring(2, 7).toUpperCase();
 }
 
-export async function isUserInAnyTeam(userId: string): Promise<boolean | void> {
+export async function isUserInAnyTeam(userId: string): Promise<boolean> {
   try {
     const team = await Team.findOne({
       status: 'active',
-      $or: [{ leader: userId }, { players: userId }, { reserve: userId }],
+      $or: [
+        { 'leader.id': userId },
+        { 'players.id': userId },
+        { 'reserve.id': userId }
+      ]
     });
     return !!team;
   } catch (error) {
     logger.error('Error checking if user is in any team:', error);
+    return true;
   }
 }
 
@@ -206,11 +211,9 @@ export async function updateTeamMessage(interaction: any, teamId: string) {
   }
 }
 
-export async function getTeamIdByLeader(
-  userId: string,
-): Promise<string | null> {
+export async function getTeamIdByLeader(userId: string): Promise<string | null> {
   try {
-    const team = await Team.findOne({ leader: userId, status: 'active' });
+    const team = await Team.findOne({ 'leader.id': userId, status: 'active' });
     return team ? team.teamId : null;
   } catch (error) {
     logger.error(`Error in getTeamIdByLeader: ${error}`);

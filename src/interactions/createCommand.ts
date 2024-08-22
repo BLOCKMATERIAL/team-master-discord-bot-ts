@@ -13,7 +13,8 @@ export async function handleCreateCommand(
   interaction: ChatInputCommandInteraction,
 ) {
   try {
-    if (await isUserInAnyTeam(interaction.user.id)) {
+    const userInTeam = await isUserInAnyTeam(interaction.user.id);
+    if (userInTeam) {
       await interaction.reply({
         content:
           'Ви вже є учасником, лідером або в резерві команди. Ви не можете створити нову команду.',
