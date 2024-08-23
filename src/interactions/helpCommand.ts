@@ -67,6 +67,11 @@ export async function handleHelpCommand(
           'Бот розроблений [Myroslav ](https://github.com/BLOCKMATERIAL).\n' +
           "Зв'язатися з автором: materialblock@gmail.com",
       },
+      {
+        name: 'Версія',
+        value:
+          'Версія бота: 0.0.9\n'
+      },
     )
     .setFooter({ text: 'Розроблено з ❤️ для української геймінг-спільноти' });
 
