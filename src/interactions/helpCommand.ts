@@ -70,7 +70,7 @@ export async function handleHelpCommand(
       {
         name: 'Версія',
         value:
-          'Версія бота: 0.0.9\n'
+          'Версія бота: 0.0.1\n'
       },
     )
     .setFooter({ text: 'Розроблено з ❤️ для української геймінг-спільноти' });
